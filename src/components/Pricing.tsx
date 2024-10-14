@@ -33,9 +33,9 @@ export default function Pricing() {
               ]}
               buttonLabel="Get Started"
               customColor={{
-                bg: "bg-blue-600 text-white",
+                bg: "bg-blue-600 text-white dark:bg-blue-700",
                 desc: "text-blue-100",
-                btn: "bg-white text-blue-600 hover:bg-blue-50",
+                btn: "bg-white text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-200",
               }}
             />
           </div>

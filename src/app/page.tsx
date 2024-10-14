@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 dark:bg-black dark:text-white">
         <Hero />
         <Features />
         <Pricing />
