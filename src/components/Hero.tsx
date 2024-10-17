@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ComingSoon from "./ComingSoon";
 import { Button } from "./ui/button";
 
@@ -18,7 +19,9 @@ export default function Hero() {
               </p>
             </div>
             <div className="space-x-4">
-              <Button disabled>Get Started for Free</Button>
+              <Button asChild>
+                <Link href="/login">Get Started for Free</Link>
+              </Button>
               <Button variant="outline" disabled>
                 Watch Demo
               </Button>

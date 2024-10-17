@@ -7,16 +7,12 @@ import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-[100dvh]">
-      <Header />
-      <main className="flex-1 dark:bg-black dark:text-white">
-        <Hero />
-        <Features />
-        <Pricing />
-        <Testimonials />
-        {/* Add other sections here */}
-      </main>
-      <Footer />
-    </div>
+    <>
+      <Hero />
+      <Features />
+      <Pricing />
+      <Testimonials />
+      {/* Add other sections here */}
+    </>
   );
 }
