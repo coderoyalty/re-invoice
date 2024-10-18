@@ -1,7 +1,7 @@
 import type { User, Session } from "@prisma/client";
 import { base32, encodeHex } from "oslo/encoding";
 import { sha256 } from "oslo/crypto";
-import prisma from "./prisma";
+import prisma from "../prisma";
 
 export function generateSessionToken() {
   const bytes = new Uint8Array(20);
@@ -18,7 +18,6 @@ export async function createSession(
     ipAddress: string;
   }
 ): Promise<Session> {
-  //TODO
   const sessionId = encodeHex(await sha256(base32.decode(token)));
   const sessionData = {
     id: sessionId,
@@ -28,7 +27,7 @@ export async function createSession(
     ...data,
   };
 
-  const session = prisma.session.create({
+  const session = await prisma.session.create({
     data: {
       ...sessionData,
     },

@@ -19,23 +19,55 @@ import {
 import { Input } from "@/components/ui/input";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import LoadingBtn from "@/components/LoadingBtn";
+import React from "react";
+import { toast } from "@/hooks/use-toast";
+import { signIn } from "../actions/auth";
 
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
 
+type FormFieldType = z.infer<typeof formSchema>;
+
 export default function LoginForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const [isLoading, setLoading] = React.useState(false);
+
+  const form = useForm<FormFieldType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
+
+  const onSubmit: SubmitHandler<FormFieldType> = async (data) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+
+      for (const [name, value] of Object.entries(data)) {
+        formData.append(name, value);
+      }
+
+      await signIn(formData);
+
+      toast({
+        title: "Login Successfully",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Something went wrong",
+        description: err.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -47,7 +79,7 @@ export default function LoginForm() {
               Enter your details below to login to your account
             </CardDescription>
           </CardHeader>
-          <form onSubmit={() => {}}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent>
               <div className="grid gap-4">
                 {/* Email Field */}
@@ -99,9 +131,13 @@ export default function LoginForm() {
                   )}
                 />
 
-                <Button type="submit" className="w-full">
+                <LoadingBtn
+                  loading={isLoading}
+                  type="submit"
+                  className="w-full"
+                >
                   Login
-                </Button>
+                </LoadingBtn>
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     type="button"
