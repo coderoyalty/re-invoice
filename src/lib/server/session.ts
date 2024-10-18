@@ -3,8 +3,6 @@ import { base32, encodeHex } from "oslo/encoding";
 import { sha256 } from "oslo/crypto";
 import prisma from "../prisma";
 
-export const SESSION_COOKIE_NAME = "session";
-
 export function generateSessionToken() {
   const bytes = new Uint8Array(20);
   crypto.getRandomValues(bytes);
