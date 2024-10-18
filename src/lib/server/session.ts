@@ -1,7 +1,9 @@
 import type { User, Session } from "@prisma/client";
 import { base32, encodeHex } from "oslo/encoding";
 import { sha256 } from "oslo/crypto";
-import prisma from "./prisma";
+import prisma from "../prisma";
+
+export const SESSION_COOKIE_NAME = "session";
 
 export function generateSessionToken() {
   const bytes = new Uint8Array(20);
