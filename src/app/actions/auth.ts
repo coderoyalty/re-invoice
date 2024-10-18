@@ -1,7 +1,10 @@
 "use server";
 import prisma from "@/lib/prisma";
-import { hashPassword } from "@/utils/password";
+import { setSessionCookie } from "@/lib/server/cookies";
+import { createSession, generateSessionToken } from "@/lib/server/session";
+import { hashPassword, verifyPassword } from "@/utils/password";
 import { redirect } from "next/navigation";
+import { NextRequest } from "next/server";
 
 export async function signUp(formData: FormData) {
   const { displayName, email, password } = Object.fromEntries(
@@ -32,4 +35,39 @@ export async function signUp(formData: FormData) {
   });
 
   redirect("/login");
+}
+
+export async function signIn(formData: FormData) {
+  const data = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  };
+
+  const result = await prisma.user.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+
+  if (result === null) {
+    throw new Error("Incorrect email or password");
+  }
+
+  const validPassword = await verifyPassword(data.password, result.password);
+  if (!validPassword) {
+    throw new Error("Incorrect email or password");
+  }
+
+  const userAgent = "";
+  const ipAddress = "";
+
+  const token = generateSessionToken();
+  const session = await createSession(token, result.id, {
+    userAgent,
+    ipAddress,
+  });
+
+  setSessionCookie(token, session.expiresAt);
+
+  redirect("/");
 }
