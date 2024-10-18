@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Form,
   FormControl,
@@ -8,7 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -23,6 +22,11 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { toast } from "@/hooks/use-toast";
+import LoadingBtn from "@/components/LoadingBtn";
+import React from "react";
+
+import { signUp } from "../actions/auth";
 
 const formSchema = z.object({
   displayName: z.string().min(2),
@@ -30,8 +34,12 @@ const formSchema = z.object({
   password: z.string().min(8),
 });
 
+type FormFieldType = z.infer<typeof formSchema>;
+
 export default function RegistrationForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const [isLoading, setLoading] = React.useState(false);
+
+  const form = useForm<FormFieldType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       displayName: "",
@@ -39,6 +47,30 @@ export default function RegistrationForm() {
       password: "",
     },
   });
+
+  const onSubmit: SubmitHandler<FormFieldType> = async (data) => {
+    const formData = new FormData();
+
+    for (const [name, value] of Object.entries(data)) {
+      formData.append(name, value);
+    }
+
+    try {
+      setLoading(true);
+      await signUp(formData);
+      toast({
+        title: "Account Created Successfully",
+        description: "Check your email to verify your account",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Unable to Create Account",
+        description: err.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -50,7 +82,7 @@ export default function RegistrationForm() {
               Enter your information to create an account
             </CardDescription>
           </CardHeader>
-          <form onSubmit={() => {}}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent>
               <div className="grid gap-4">
                 {/* Name Field */}
@@ -117,9 +149,13 @@ export default function RegistrationForm() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <LoadingBtn
+                  loading={isLoading}
+                  type="submit"
+                  className="w-full"
+                >
                   Sign Up
-                </Button>
+                </LoadingBtn>
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     type="button"
