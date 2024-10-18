@@ -18,7 +18,6 @@ export async function createSession(
     ipAddress: string;
   }
 ): Promise<Session> {
-  //TODO
   const sessionId = encodeHex(await sha256(base32.decode(token)));
   const sessionData = {
     id: sessionId,
@@ -28,7 +27,7 @@ export async function createSession(
     ...data,
   };
 
-  const session = prisma.session.create({
+  const session = await prisma.session.create({
     data: {
       ...sessionData,
     },
