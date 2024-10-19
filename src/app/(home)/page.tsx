@@ -10,7 +10,6 @@ export default function Home() {
       <Features />
       <Pricing />
       <Testimonials />
-      {/* Add other sections here */}
     </>
   );
 }
