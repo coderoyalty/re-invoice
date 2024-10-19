@@ -25,7 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingBtn from "@/components/LoadingBtn";
 import React from "react";
 import { toast } from "@/hooks/use-toast";
-import { signIn } from "../actions/auth";
+import { signIn } from "@/app/actions/auth";
 
 const formSchema = z.object({
   email: z.string().email(),
