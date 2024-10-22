@@ -1,10 +1,17 @@
 "use server";
 import prisma from "@/lib/prisma";
-import { setSessionCookie } from "@/lib/server/cookies";
-import { createSession, generateSessionToken } from "@/lib/server/session";
+import {
+  deleteSessionCookie,
+  getSessionCookie,
+  setSessionCookie,
+} from "@/lib/server/cookies";
+import {
+  createSession,
+  generateSessionToken,
+  invalidateSession,
+} from "@/lib/server/session";
 import { hashPassword, verifyPassword } from "@/utils/password";
 import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
 
 export async function signUp(formData: FormData) {
   const { displayName, email, password } = Object.fromEntries(
@@ -70,4 +77,15 @@ export async function signIn(formData: FormData) {
   setSessionCookie(token, session.expiresAt);
 
   redirect("/");
+}
+
+export async function signOut() {
+  const sessionId = getSessionCookie();
+  if (!sessionId) {
+    return redirect("/login");
+  }
+  deleteSessionCookie();
+  await invalidateSession(sessionId);
+
+  redirect("/login");
 }
