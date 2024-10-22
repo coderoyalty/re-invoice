@@ -6,7 +6,7 @@ export default async () => {
   const { user } = await auth();
 
   if (user !== null) {
-    return redirect("/");
+    return redirect("/dashboard");
   }
 
   return (

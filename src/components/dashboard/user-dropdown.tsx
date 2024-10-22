@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { redirect } from "next/navigation";
 
 const UserDropDown = () => {
   return (
@@ -36,6 +37,8 @@ const UserDropDown = () => {
           className="hover:bg-red-600"
           onClick={async () => {
             await signOut();
+
+            redirect("/login");
           }}
         >
           Log out

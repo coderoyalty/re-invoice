@@ -2,7 +2,11 @@ import Link from "next/link";
 import ComingSoon from "./ComingSoon";
 import { Button } from "./ui/button";
 
-export default function Hero() {
+export default function Hero({
+  authenticated = true,
+}: {
+  authenticated?: boolean;
+}) {
   return (
     <>
       <section className="w-full min-h-[70dvh] flex items-center py-12 md:py-24 lg:py-32 xl:py-48">
@@ -19,8 +23,17 @@ export default function Hero() {
               </p>
             </div>
             <div className="space-x-4">
-              <Button asChild>
-                <Link href="/login">Get Started for Free</Link>
+              <Button
+                asChild
+                className={`${
+                  authenticated ? "bg-green-500 hover:bg-green-600" : ""
+                }`}
+              >
+                {authenticated ? (
+                  <Link href="/dashboard">Go To Dashboard</Link>
+                ) : (
+                  <Link href="/login">Get Started for Free</Link>
+                )}
               </Button>
               <Button variant="outline" disabled>
                 Watch Demo

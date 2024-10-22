@@ -20,7 +20,8 @@ import { Plus, Download, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardNavType } from "@/components/dashboard/nav";
 import React from "react";
-import Link from "next/link";
+import { auth } from "@/lib";
+import { redirect } from "next/navigation";
 
 const orgs = [
   { id: "default", name: "My Organization" },
@@ -116,9 +117,7 @@ export default function Dashboard() {
                 <TableBody>
                   {invoices.map((inv) => (
                     <TableRow key={inv.id}>
-                      <Link href="">
-                        <TableCell className="font-medium">{inv.id}</TableCell>
-                      </Link>
+                      <TableCell className="font-medium">{inv.id}</TableCell>
                       <TableCell>{inv.status}</TableCell>
                       <TableCell>{inv.client}</TableCell>
                       <TableCell className="text-right">

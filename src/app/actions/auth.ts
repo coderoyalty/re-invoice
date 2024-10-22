@@ -76,16 +76,14 @@ export async function signIn(formData: FormData) {
 
   setSessionCookie(token, session.expiresAt);
 
-  redirect("/");
+  redirect("/dashboard");
 }
 
 export async function signOut() {
-  const sessionId = getSessionCookie();
-  if (!sessionId) {
-    return redirect("/login");
+  const token = getSessionCookie();
+  if (!token) {
+    return;
   }
   deleteSessionCookie();
-  await invalidateSession(sessionId);
-
-  redirect("/login");
+  await invalidateSession(token);
 }
