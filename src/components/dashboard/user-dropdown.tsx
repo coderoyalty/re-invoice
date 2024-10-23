@@ -16,12 +16,15 @@ const UserDropDown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src="/placeholder-user.jpg" alt="@jane.doe" />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
-        </Button>
+        <div className="cursor-pointer text-secondary-foreground hover:bg-primary-foreground px-4 py-2 rounded-md h-auto flex items-center space-x-2">
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src="/placeholder-user.jpg" alt="@jane.doe" />
+              <AvatarFallback>JD</AvatarFallback>
+            </Avatar>
+          </Button>
+          <div>Jane Doe</div>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">

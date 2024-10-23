@@ -1,27 +1,10 @@
 "use client";
-import SummarySection from "@/components/dashboard/summary-section";
-import UserDropDown from "@/components/dashboard/user-dropdown";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { Plus, Download, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DashboardNavType } from "@/components/dashboard/nav";
 import React from "react";
-import { auth } from "@/lib";
-import { redirect } from "next/navigation";
+import UserDropDown from "@/components/dashboard/user-dropdown";
+import RecentInvoiceSkeleton from "@/components/ui/skeletons/recent-invoice";
+import RecentInvoice from "../../components/dashboard/recent-invoice";
+import SummaryCards from "@/components/dashboard/summary-cards";
+import SummaryCardsSkeleton from "@/components/ui/skeletons/summary-cards";
 
 const orgs = [
   { id: "default", name: "My Organization" },
@@ -30,52 +13,7 @@ const orgs = [
   { id: "org2", name: "Client C Inc." },
 ];
 
-const invoices = [
-  { id: "#inv-001", status: "pending", client: "TechCorp", amount: 5000 },
-  { id: "#inv-002", status: "completed", client: "InnoTech", amount: 3000 },
-  { id: "#inv-003", status: "pending", client: "DevSolutions", amount: 4500 },
-  { id: "#inv-004", status: "failed", client: "SoftWorks", amount: 1500 },
-  {
-    id: "#inv-005",
-    status: "completed",
-    client: "NextGen Systems",
-    amount: 2200,
-  },
-  {
-    id: "#inv-006",
-    status: "pending",
-    client: "Quantum Enterprises",
-    amount: 7800,
-  },
-  { id: "#inv-007", status: "failed", client: "Digital Minds", amount: 3600 },
-  {
-    id: "#inv-008",
-    status: "completed",
-    client: "Vertex Solutions",
-    amount: 5400,
-  },
-  { id: "#inv-009", status: "pending", client: "CloudNet", amount: 6700 },
-  { id: "#inv-010", status: "failed", client: "SoftPoint", amount: 1200 },
-  {
-    id: "#inv-011",
-    status: "completed",
-    client: "AI Innovations",
-    amount: 9100,
-  },
-  { id: "#inv-012", status: "pending", client: "ByteWorks", amount: 2600 },
-  { id: "#inv-013", status: "completed", client: "DataFlow", amount: 4900 },
-  {
-    id: "#inv-014",
-    status: "failed",
-    client: "Alpha Technologies",
-    amount: 3100,
-  },
-  { id: "#inv-015", status: "pending", client: "HyperNet", amount: 8200 },
-];
-
 export default function Dashboard() {
-  const [organizations, _setOrganizations] =
-    React.useState<DashboardNavType["organizations"]>(orgs);
   const [selectedOrg, setSelectedOrg] = React.useState("default");
 
   return (
@@ -93,62 +31,13 @@ export default function Dashboard() {
             <UserDropDown />
           </div>
         </div>
-        <SummarySection />
-        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="md:col-span-4">
-            <CardHeader>
-              <CardTitle>Recent Invoices</CardTitle>
-              <CardDescription>
-                You have created 30 invoices this month for{" "}
-                {organizations.find((org) => org.id === selectedOrg)?.name}.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">Invoice</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-
-                <TableBody>
-                  {invoices.map((inv) => (
-                    <TableRow key={inv.id}>
-                      <TableCell className="font-medium">{inv.id}</TableCell>
-                      <TableCell>{inv.status}</TableCell>
-                      <TableCell>{inv.client}</TableCell>
-                      <TableCell className="text-right">
-                        ${inv.amount}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-          <Card className="col-span-4 lg:col-span-3 self-start lg:top-20 lg:sticky">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Manage invoices and team for{" "}
-                {organizations.find((org) => org.id === selectedOrg)?.name}.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <Button className="w-full">
-                <Plus className="mr-2 h-4 w-4" /> Create New Invoice
-              </Button>
-              <Button variant="outline" className="w-full">
-                <Download className="mr-2 h-4 w-4" /> Download Reports
-              </Button>
-              <Button variant="outline" className="w-full">
-                <Users className="mr-2 h-4 w-4" /> Invite Team Member
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="bg-primary-foreground p-4 rounded-md shadow-md">
+          <React.Suspense fallback={<SummaryCardsSkeleton />}>
+            <SummaryCards />
+          </React.Suspense>
+          <React.Suspense fallback={<RecentInvoiceSkeleton />}>
+            <RecentInvoice organizations={orgs} selectedOrg={selectedOrg} />
+          </React.Suspense>
         </div>
       </div>
     </>
