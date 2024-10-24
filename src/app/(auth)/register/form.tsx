@@ -25,7 +25,7 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { toast } from "@/hooks/use-toast";
 import LoadingBtn from "@/components/LoadingBtn";
 import React from "react";
-import { signUp } from "@/app/actions/auth";
+import { signUp } from "@/actions/auth";
 
 const formSchema = z.object({
   displayName: z.string().min(2),
