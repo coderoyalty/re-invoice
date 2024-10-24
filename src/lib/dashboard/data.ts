@@ -1,5 +1,5 @@
 export async function fetchRecentInvoices() {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   return [
     { id: "#inv-001", status: "pending", client: "TechCorp", amount: 5000 },
     { id: "#inv-002", status: "completed", client: "InnoTech", amount: 3000 },
@@ -55,7 +55,7 @@ export async function fetchRecentInvoices() {
 }
 
 export async function fetchInvoiceSummary() {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 200));
 
   return {
     totalRevenue: 5000.0,
