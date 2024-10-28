@@ -30,7 +30,15 @@ import { signUp } from "@/actions/auth";
 const formSchema = z.object({
   displayName: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z
+    .string()
+    .min(8, { message: "Be at least 8 characters long" })
+    .regex(/[a-zA-Z]/, { message: "Contain at least one letter." })
+    .regex(/[0-9]/, { message: "Contain at least one number." })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Contain at least one special character.",
+    })
+    .trim(),
 });
 
 type FormFieldType = z.infer<typeof formSchema>;
