@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { fetchUserOrgs } from "@/lib/dashboard/data";
+import React from "react";
 
 interface SelectOrgFormProps {
   organisations: Awaited<ReturnType<typeof fetchUserOrgs>>["organisations"];
@@ -18,8 +19,9 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
   defaultOrg,
 }) => {
   const router = useRouter();
-
+  const [value, setValue] = React.useState(defaultOrg.id);
   const handleOnValueChange = (value: string) => {
+    setValue(value);
     router.push(`?currentOrg=${value}`);
   };
 
@@ -29,6 +31,7 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
         <Select
           name="currentOrg"
           defaultValue={defaultOrg.id}
+          value={value}
           onValueChange={handleOnValueChange}
         >
           <SelectTrigger className="w-[176px]">

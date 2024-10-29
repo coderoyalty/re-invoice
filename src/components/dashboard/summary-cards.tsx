@@ -111,7 +111,7 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
           {/* active organization */}
           <div className="text-2xl font-bold">{value}</div>
           <p className="text-xs text-muted-foreground">
-            Default + {(value - 1).toFixed(0)} invited
+            {value} active organizations
           </p>
         </CardContent>
       </Card>

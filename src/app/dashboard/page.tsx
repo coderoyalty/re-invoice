@@ -4,8 +4,16 @@ import RecentInvoiceSkeleton from "@/components/ui/skeletons/recent-invoice";
 import RecentInvoice from "../../components/dashboard/recent-invoice";
 import SummaryCards from "@/components/dashboard/summary-cards";
 import SummaryCardsSkeleton from "@/components/ui/skeletons/summary-cards";
+import { auth } from "@/lib";
+import { redirect } from "next/navigation";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const { user } = await auth();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
   return (
     <>
       <div className="max-w-5xl mx-auto space-y-8">
@@ -18,7 +26,7 @@ export default function Dashboard() {
           </div>
           {/* avatar */}
           <div className="flex-none">
-            <UserDropDown />
+            <UserDropDown user={user} />
           </div>
         </div>
         <div className="bg-primary-foreground p-4 rounded-md shadow-md">

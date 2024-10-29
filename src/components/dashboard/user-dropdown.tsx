@@ -10,27 +10,50 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { redirect } from "next/navigation";
+import { auth } from "@/lib";
+import React from "react";
+import { useRouter } from "next/navigation";
 
-const UserDropDown = () => {
+type AwaitedReturnType<T extends (...args: any) => any> = Awaited<
+  ReturnType<T>
+>;
+
+interface UserDropDownProps {
+  user: AwaitedReturnType<typeof auth>["user"] & {};
+}
+
+function slugifyInitials(text: string): string {
+  return text
+    .trim()
+    .split(/\s+/) // Split by spaces
+    .map((word) => word[0]?.toUpperCase() || "") // Get the first letter of each word and capitalize it
+    .join(""); // Join them without spaces or hyphens
+}
+
+const UserDropDown: React.FC<UserDropDownProps> = ({ user }) => {
+  const router = useRouter();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="cursor-pointer text-secondary-foreground hover:bg-primary-foreground px-4 py-2 rounded-md h-auto flex items-center space-x-2">
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
-              <AvatarImage src="/placeholder-user.jpg" alt="@jane.doe" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage
+                src="/placeholder-user.jpg"
+                alt={`${user.displayName}`}
+              />
+              <AvatarFallback>
+                {slugifyInitials(user.displayName)}
+              </AvatarFallback>
             </Avatar>
           </Button>
-          <div>Jane Doe</div>
+          <div>{user.displayName}</div>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">user@example.com</p>
-            <p className="text-xs leading-none text-muted-foreground">Admin</p>
+            <p className="text-sm font-medium leading-none">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -41,7 +64,7 @@ const UserDropDown = () => {
           onClick={async () => {
             await signOut();
 
-            redirect("/login");
+            router.push("/login");
           }}
         >
           Log out
