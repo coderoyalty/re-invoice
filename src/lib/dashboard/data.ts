@@ -1,4 +1,36 @@
-export async function fetchRecentInvoices() {
+import prisma from "../prisma";
+import { auth } from "..";
+import { redirect } from "next/navigation";
+
+export async function fetchUserOrgs() {
+  const { user } = await auth();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
+  const organisations = await prisma.organisation.findMany({
+    where: {
+      members: {
+        some: {
+          userId: user.id,
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+    take: 10,
+  });
+
+  return {
+    organisations,
+    defaultOrg: user.defaultOrganisation,
+  };
+}
+
+export async function fetchRecentInvoices(orgId: string | undefined) {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return [
     { id: "#inv-001", status: "pending", client: "TechCorp", amount: 5000 },
@@ -54,15 +86,35 @@ export async function fetchRecentInvoices() {
   ];
 }
 
-export async function fetchInvoiceSummary() {
-  await new Promise((resolve) => setTimeout(resolve, 200));
+export async function fetchInvoiceSummary(orgId?: string) {
+  const { user } = await auth();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
+  const memberships = await prisma.organisationMember.findMany({
+    where: {
+      userId: user?.id,
+    },
+    include: {
+      organisation: {
+        include: { members: true },
+      },
+    },
+  });
+
+  const teamMembers = memberships.reduce((total, value) => {
+    const eachMembers = value.organisation.members.length ?? 0;
+    return total + Math.max(0, eachMembers - 1);
+  }, 0);
 
   return {
     totalRevenue: 5000.0,
     totalPending: 178.2,
     totalInvoices: 20,
-    teamMembers: 10,
+    teamMembers,
     invoiceSent: 10,
-    activeOrganizations: 4,
+    activeOrganizations: memberships.length,
   };
 }

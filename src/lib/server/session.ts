@@ -36,9 +36,7 @@ export async function createSession(
   return session;
 }
 
-export async function validateSessionToken(
-  token: string
-): Promise<SessionInvalidationResult> {
+export async function validateSessionToken(token: string) {
   const sessionId = encodeHex(await sha256(base32.decode(token)));
 
   const result = await prisma.session.findUnique({
@@ -46,7 +44,16 @@ export async function validateSessionToken(
       id: sessionId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          displayName: true,
+          email: true,
+          emailConfirmedAt: true,
+          password: false,
+          defaultOrganisation: true,
+        },
+      },
     },
   });
 
@@ -93,6 +100,6 @@ export async function invalidateSession(token: string): Promise<void> {
   });
 }
 
-export type SessionInvalidationResult =
-  | { session: Session; user: User }
-  | { session: null; user: null };
+export type SessionInvalidationResult = Awaited<
+  ReturnType<typeof validateSessionToken>
+>;

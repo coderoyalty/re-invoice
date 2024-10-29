@@ -10,7 +10,9 @@ import {
   generateSessionToken,
   invalidateSession,
 } from "@/lib/server/session";
-import { hashPassword, verifyPassword } from "@/utils/password";
+import { createAccount, createDefaultOrg } from "@/lib/users/data";
+import { extractFirstName } from "@/lib/utils";
+import { verifyPassword } from "@/utils/password";
 import { redirect } from "next/navigation";
 
 export async function signUp(formData: FormData) {
@@ -22,23 +24,13 @@ export async function signUp(formData: FormData) {
     email: email! as string,
     password: password! as string,
   };
-  const result = await prisma.user.findUnique({
-    where: {
-      email: data.email,
-    },
-  });
 
-  if (result) {
-    // user already exist?
-    throw new Error("An account already exist with the provided email address");
-  }
+  const user = await createAccount(data);
 
-  data.password = await hashPassword(data.password);
-
-  const newUser = await prisma.user.create({
-    data: {
-      ...data,
-    },
+  await createDefaultOrg({
+    userId: user.id,
+    businessType: "individual",
+    orgName: `${extractFirstName(user.displayName)}\`s Org`,
   });
 
   redirect("/login");
@@ -54,10 +46,17 @@ export async function signIn(formData: FormData) {
     where: {
       email: data.email,
     },
+    include: {
+      defaultOrganisation: true,
+    },
   });
 
   if (result === null) {
     throw new Error("Incorrect email or password");
+  }
+
+  if (!result.emailConfirmedAt) {
+    throw new Error("Email address has not been confirmed");
   }
 
   const validPassword = await verifyPassword(data.password, result.password);

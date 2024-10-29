@@ -1,7 +1,9 @@
+"use client";
 import { DollarSign, User, Building, Users, Table2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { fetchInvoiceSummary } from "@/lib/dashboard/data";
 import React from "react";
+import { useSearchParams } from "next/navigation";
 
 function formatWithSign(value: number) {
   return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
@@ -117,16 +119,40 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
-export default async function SummaryCards() {
-  const summary = await fetchInvoiceSummary();
+export default function SummaryCards() {
+  const [data, setData] = React.useState<Awaited<
+    ReturnType<typeof fetchInvoiceSummary>
+  > | null>(null);
+
+  const param = useSearchParams();
+  const currentOrg = param.get("currentOrg");
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const url = `/api/users/stats/summary${
+          currentOrg ? `?currentOrg=${currentOrg}` : ""
+        }`;
+        const res = await fetch(url, { method: "GET" });
+        const result = await res.json();
+
+        setData(result);
+      } catch (err) {
+        setData(null);
+      }
+    };
+
+    fetchData();
+  }, [currentOrg]);
+
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <TotalRevenueCard value={summary.totalRevenue} />
-        <TotalInvoiceCard value={summary.totalInvoices} />
-        <InvoiceSentCard value={summary.invoiceSent} />
-        <ActiveOrgCard value={summary.activeOrganizations} />
-        <TeamMembersCard value={summary.teamMembers} />
+        <TotalRevenueCard value={data?.totalRevenue ?? 0} />
+        <TotalInvoiceCard value={data?.totalInvoices ?? 0} />
+        <InvoiceSentCard value={data?.invoiceSent ?? 0} />
+        <ActiveOrgCard value={data?.activeOrganizations ?? 0} />
+        <TeamMembersCard value={data?.teamMembers ?? 0} />
       </div>
     </>
   );

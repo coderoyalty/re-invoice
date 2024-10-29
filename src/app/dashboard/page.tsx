@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import UserDropDown from "@/components/dashboard/user-dropdown";
 import RecentInvoiceSkeleton from "@/components/ui/skeletons/recent-invoice";
@@ -6,16 +5,7 @@ import RecentInvoice from "../../components/dashboard/recent-invoice";
 import SummaryCards from "@/components/dashboard/summary-cards";
 import SummaryCardsSkeleton from "@/components/ui/skeletons/summary-cards";
 
-const orgs = [
-  { id: "default", name: "My Organization" },
-  { id: "org1", name: "Client A Inc." },
-  { id: "org2", name: "Client B Ltd." },
-  { id: "org2", name: "Client C Inc." },
-];
-
 export default function Dashboard() {
-  const [selectedOrg, setSelectedOrg] = React.useState("default");
-
   return (
     <>
       <div className="max-w-5xl mx-auto space-y-8">
@@ -36,7 +26,7 @@ export default function Dashboard() {
             <SummaryCards />
           </React.Suspense>
           <React.Suspense fallback={<RecentInvoiceSkeleton />}>
-            <RecentInvoice organizations={orgs} selectedOrg={selectedOrg} />
+            <RecentInvoice />
           </React.Suspense>
         </div>
       </div>
