@@ -19,8 +19,10 @@ export default async function Dashboard() {
       <div className="max-w-5xl mx-auto space-y-8">
         <div className="w-full flex items-center">
           <div className="flex-grow flex flex-col">
-            <h1 className="text-2xl font-bold">Welcome Back!</h1>
-            <span className="text-muted-foreground">
+            <h1 className="text-xl md:text-2xl xl:text-3xl font-bold">
+              Welcome Back!
+            </h1>
+            <span className="text-muted-foreground max-[340px]:sr-only">
               Here's an insight of your data for this month
             </span>
           </div>
@@ -29,7 +31,7 @@ export default async function Dashboard() {
             <UserDropDown user={user} />
           </div>
         </div>
-        <div className="bg-primary-foreground p-4 rounded-md shadow-md">
+        <div className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
           <React.Suspense fallback={<SummaryCardsSkeleton />}>
             <SummaryCards />
           </React.Suspense>
