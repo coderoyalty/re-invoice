@@ -1,6 +1,5 @@
 import React from "react";
 import UserDropDown from "@/components/dashboard/user-dropdown";
-import RecentInvoiceSkeleton from "@/components/ui/skeletons/recent-invoice";
 import RecentInvoice from "../../components/dashboard/recent-invoice";
 import SummaryCards from "@/components/dashboard/summary-cards";
 import { auth } from "@/lib";
@@ -31,8 +30,8 @@ export default async function Dashboard() {
           </div>
         </div>
         <div className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
-          <SummaryCards />
-            <RecentInvoice defaultOrg={user.defaultOrganisation!.id} />
+          <SummaryCards defaultOrg={user.defaultOrganisation?.id ?? ""} />
+          <RecentInvoice defaultOrg={user.defaultOrganisation?.id ?? ""} />
         </div>
       </div>
     </>

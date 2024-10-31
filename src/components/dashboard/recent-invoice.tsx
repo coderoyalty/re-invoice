@@ -24,8 +24,6 @@ import RecentInvoiceSkeleton from "../ui/skeletons/recent-invoice";
 import Link from "next/link";
 
 export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
-  // const recentInvoices = await fetchRecentInvoices("");
-
   const [invoices, setInvoices] = React.useState<
     AwaitedReturnType<typeof fetchRecentInvoices>
   >([]);
@@ -79,11 +77,6 @@ export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
             <CardDescription>
               You have created {invoices.length} invoices this month.
             </CardDescription>
-            {state.error && (
-              <p className="text-red-500">
-                We couldn't fetch your recent invoice
-              </p>
-            )}
           </CardHeader>
           <CardContent>
             <Table>

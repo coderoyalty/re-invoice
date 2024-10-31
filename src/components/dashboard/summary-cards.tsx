@@ -5,6 +5,7 @@ import { fetchInvoiceSummary } from "@/lib/dashboard/data";
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import SummaryCardsSkeleton from "../ui/skeletons/summary-cards";
+import { AwaitedReturnType } from "@/lib/types";
 
 function formatWithSign(value: number) {
   return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
@@ -117,38 +118,45 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
-export default function SummaryCards() {
-  const [data, setData] = React.useState<Awaited<
-    ReturnType<typeof fetchInvoiceSummary>
-  > | null>(null);
+export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
+  const [data, setData] = React.useState<
+    AwaitedReturnType<typeof fetchInvoiceSummary>
+  >({} as any);
 
-  const [loading, setLoading] = React.useState(false);
+  const [state, setState] = React.useState({
+    error: false,
+    pending: true,
+  });
 
   const param = useSearchParams();
   const currentOrg = param.get("currentOrg");
 
   React.useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setState({ pending: true, error: false });
       try {
-        const url = `/api/users/stats/summary${
-          currentOrg ? `?currentOrg=${currentOrg}` : ""
-        }`;
-        const res = await fetch(url, { method: "GET" });
-        const result = await res.json();
+        const org = currentOrg ?? defaultOrg;
 
+        const url = `/api/organisations/${org}/summary`;
+        const res = await fetch(url, { method: "GET" });
+
+        if (!res.ok) {
+          throw new Error();
+        }
+
+        const result = await res.json();
         setData(result);
       } catch (err) {
-        setData(null);
+        setState((prev) => ({ ...prev, error: true }));
       } finally {
-        setLoading(false);
+        setState((prev) => ({ ...prev, pending: false }));
       }
     };
 
     fetchData();
   }, [currentOrg]);
 
-  if (loading || data === null) {
+  if (state.pending) {
     return <SummaryCardsSkeleton />;
   }
 
