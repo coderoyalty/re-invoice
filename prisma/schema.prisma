@@ -26,6 +26,7 @@ model User {
   sessions    Session[]
   createdOrgs Organisation[]       @relation("OrgCreator")
   memberships OrganisationMember[] @relation("UserMemberships")
+  invoices    Invoice[]
 
   @@index([defaultOrganisationId])
 }
@@ -51,12 +52,17 @@ model Organisation {
   businessType    BusinessType     @default(individual)
   businessProfile BusinessProfile?
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
   creatorId String
   creator   User   @relation("OrgCreator", fields: [creatorId], references: [id])
 
   defaultUsers User[] @relation("DefaultOrg")
 
   members OrganisationMember[] @relation("OrganisationMembers")
+
+  invoices Invoice[]
 
   @@index([creatorId])
 }
@@ -66,6 +72,9 @@ model OrganisationMember {
 
   userId String
   orgId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   user         User         @relation("UserMemberships", fields: [userId], references: [id])
   organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id])
@@ -81,6 +90,9 @@ enum BusinessType {
 model BusinessProfile {
   id String @id @default(uuid())
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
   organisationName String
   firstName        String
   lastName         String
@@ -95,5 +107,28 @@ model BusinessProfile {
   country      String
 
   orgId        String       @unique
+  organisation Organisation @relation(references: [id], fields: [orgId])
+}
+
+enum InvoiceStatus {
+  pending
+  completed
+  failed
+}
+
+model Invoice {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  amount Decimal
+  client String
+  status InvoiceStatus @default(pending)
+
+  creatorId String
+  creator   User   @relation(references: [id], fields: [creatorId])
+
+  orgId        String
   organisation Organisation @relation(references: [id], fields: [orgId])
 }
