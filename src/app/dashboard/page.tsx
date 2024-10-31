@@ -32,9 +32,7 @@ export default async function Dashboard() {
         </div>
         <div className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
           <SummaryCards />
-          <React.Suspense fallback={<RecentInvoiceSkeleton />}>
-            <RecentInvoice />
-          </React.Suspense>
+            <RecentInvoice defaultOrg={user.defaultOrganisation!.id} />
         </div>
       </div>
     </>

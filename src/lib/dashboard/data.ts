@@ -31,60 +31,39 @@ export async function fetchUserOrgs() {
   };
 }
 
-export async function fetchRecentInvoices(orgId: string | undefined) {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  return [
-    { id: "#inv-001", status: "pending", client: "TechCorp", amount: 5000 },
-    { id: "#inv-002", status: "completed", client: "InnoTech", amount: 3000 },
-    {
-      id: "#inv-003",
-      status: "pending",
-      client: "DevSolutions",
-      amount: 4500,
+export async function fetchRecentInvoices(orgId: string) {
+  const { user } = await auth();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
+  const result = await prisma.invoice.findMany({
+    where: {
+      orgId: orgId,
     },
-    { id: "#inv-004", status: "failed", client: "SoftWorks", amount: 1500 },
-    {
-      id: "#inv-005",
-      status: "completed",
-      client: "NextGen Systems",
-      amount: 2200,
+    take: 15,
+    orderBy: [
+      {
+        createdAt: "desc",
+      },
+      {
+        updatedAt: "desc",
+      },
+    ],
+    select: {
+      id: true,
+      status: true,
+      client: true,
+      amount: true,
     },
-    {
-      id: "#inv-006",
-      status: "pending",
-      client: "Quantum Enterprises",
-      amount: 7800,
-    },
-    {
-      id: "#inv-007",
-      status: "failed",
-      client: "Digital Minds",
-      amount: 3600,
-    },
-    {
-      id: "#inv-008",
-      status: "completed",
-      client: "Vertex Solutions",
-      amount: 5400,
-    },
-    { id: "#inv-009", status: "pending", client: "CloudNet", amount: 6700 },
-    { id: "#inv-010", status: "failed", client: "SoftPoint", amount: 1200 },
-    {
-      id: "#inv-011",
-      status: "completed",
-      client: "AI Innovations",
-      amount: 9100,
-    },
-    { id: "#inv-012", status: "pending", client: "ByteWorks", amount: 2600 },
-    { id: "#inv-013", status: "completed", client: "DataFlow", amount: 4900 },
-    {
-      id: "#inv-014",
-      status: "failed",
-      client: "Alpha Technologies",
-      amount: 3100,
-    },
-    { id: "#inv-015", status: "pending", client: "HyperNet", amount: 8200 },
-  ];
+  });
+
+  return result.map((inv) => ({
+    ...inv,
+    amount: inv.amount.toNumber(),
+    shortId: inv.id.split("-")[0],
+  }));
 }
 
 export async function fetchInvoiceSummary(orgId: string | null = null) {
