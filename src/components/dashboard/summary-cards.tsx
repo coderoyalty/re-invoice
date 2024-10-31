@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { fetchInvoiceSummary } from "@/lib/dashboard/data";
 import React from "react";
 import { useSearchParams } from "next/navigation";
+import SummaryCardsSkeleton from "../ui/skeletons/summary-cards";
 
 function formatWithSign(value: number) {
   return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
@@ -23,9 +24,6 @@ const TotalRevenueCard: React.FC<{
         <CardContent>
           {/* total invoices */}
           <div className="text-2xl font-bold">${value.toFixed(2)}</div>
-          <p className="text-xs text-muted-foreground">
-            {formatWithSign(lastMonthPercent)}% from last month
-          </p>
         </CardContent>
       </Card>
     </>
@@ -56,8 +54,8 @@ const TotalInvoiceCard: React.FC<{
 
 const InvoiceSentCard: React.FC<{
   value: number;
-  lastMonthPercent?: number;
-}> = ({ value, lastMonthPercent = 0.0 }) => {
+  percentDiff: number;
+}> = ({ value, percentDiff = 0.0 }) => {
   return (
     <>
       <Card>
@@ -69,7 +67,7 @@ const InvoiceSentCard: React.FC<{
           {/* invoices sent */}
           <div className="text-2xl font-bold">+{value}</div>
           <p className="text-xs text-muted-foreground">
-            {formatWithSign(lastMonthPercent)} from last month
+            {formatWithSign(percentDiff)}% from last month
           </p>
         </CardContent>
       </Card>
@@ -124,11 +122,14 @@ export default function SummaryCards() {
     ReturnType<typeof fetchInvoiceSummary>
   > | null>(null);
 
+  const [loading, setLoading] = React.useState(false);
+
   const param = useSearchParams();
   const currentOrg = param.get("currentOrg");
 
   React.useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const url = `/api/users/stats/summary${
           currentOrg ? `?currentOrg=${currentOrg}` : ""
@@ -139,20 +140,29 @@ export default function SummaryCards() {
         setData(result);
       } catch (err) {
         setData(null);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [currentOrg]);
 
+  if (loading || data === null) {
+    return <SummaryCardsSkeleton />;
+  }
+
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <TotalRevenueCard value={data?.totalRevenue ?? 0} />
-        <TotalInvoiceCard value={data?.totalInvoices ?? 0} />
-        <InvoiceSentCard value={data?.invoiceSent ?? 0} />
-        <ActiveOrgCard value={data?.activeOrganizations ?? 0} />
-        <TeamMembersCard value={data?.teamMembers ?? 0} />
+        <TotalRevenueCard value={data.totalRevenue} />
+        <TotalInvoiceCard value={data.totalInvoices} />
+        <InvoiceSentCard
+          value={data.thisMonth.sent}
+          percentDiff={data.thisMonth.percentDiff}
+        />
+        <ActiveOrgCard value={data.activeOrganisations} />
+        <TeamMembersCard value={data.teamMembers} />
       </div>
     </>
   );

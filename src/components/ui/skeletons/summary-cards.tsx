@@ -15,9 +15,6 @@ export default function SummaryCardsSkeleton() {
             <div className="text-2xl font-bold">
               $<Skeleton className="w-12 h-4 ml-2 inline-block" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
           </CardContent>
         </Card>
         <Card>
@@ -45,7 +42,7 @@ export default function SummaryCardsSkeleton() {
               <Skeleton className="w-12 h-4 ml-2 inline-block" />
             </div>
             <p className="text-xs text-muted-foreground">
-              +180.1% from last month
+              +0.0% from last month
             </p>
           </CardContent>
         </Card>
@@ -60,7 +57,9 @@ export default function SummaryCardsSkeleton() {
             <div className="text-2xl font-bold">
               <Skeleton className="w-12 h-4 inline-block" />
             </div>
-            <p className="text-xs text-muted-foreground">Default + 2 invited</p>
+            <p className="text-xs text-muted-foreground">
+              0 active organization
+            </p>
           </CardContent>
         </Card>
         <Card>

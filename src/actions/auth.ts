@@ -30,7 +30,7 @@ export async function signUp(formData: FormData) {
   await createDefaultOrg({
     userId: user.id,
     businessType: "individual",
-    orgName: `${extractFirstName(user.displayName)}\`s Org`,
+    orgName: `${extractFirstName(user.displayName)}\`s org`,
   });
 
   redirect("/login");

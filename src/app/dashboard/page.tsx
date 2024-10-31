@@ -3,7 +3,6 @@ import UserDropDown from "@/components/dashboard/user-dropdown";
 import RecentInvoiceSkeleton from "@/components/ui/skeletons/recent-invoice";
 import RecentInvoice from "../../components/dashboard/recent-invoice";
 import SummaryCards from "@/components/dashboard/summary-cards";
-import SummaryCardsSkeleton from "@/components/ui/skeletons/summary-cards";
 import { auth } from "@/lib";
 import { redirect } from "next/navigation";
 
@@ -32,9 +31,7 @@ export default async function Dashboard() {
           </div>
         </div>
         <div className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
-          <React.Suspense fallback={<SummaryCardsSkeleton />}>
-            <SummaryCards />
-          </React.Suspense>
+          <SummaryCards />
           <React.Suspense fallback={<RecentInvoiceSkeleton />}>
             <RecentInvoice />
           </React.Suspense>

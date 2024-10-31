@@ -1,6 +1,7 @@
 import prisma from "../prisma";
 import { auth } from "..";
 import { redirect } from "next/navigation";
+import { getPercentDiff, getRelativeMonthAndDays } from "../utils";
 
 export async function fetchUserOrgs() {
   const { user } = await auth();
@@ -86,35 +87,78 @@ export async function fetchRecentInvoices(orgId: string | undefined) {
   ];
 }
 
-export async function fetchInvoiceSummary(orgId?: string) {
+export async function fetchInvoiceSummary(orgId: string | null = null) {
   const { user } = await auth();
+  if (!user) return redirect("/login");
 
-  if (!user) {
-    return redirect("/login");
-  }
+  const userId = user.id;
+  const orgIdToUse = orgId ?? user.defaultOrganisation?.id;
+  if (!orgIdToUse) throw new Error("No organization ID provided.");
+
+  const dateRanges = {
+    thisMonth: getRelativeMonthAndDays(0),
+    prevMonth: getRelativeMonthAndDays(-1),
+  };
 
   const memberships = await prisma.organisationMember.findMany({
-    where: {
-      userId: user?.id,
-    },
-    include: {
-      organisation: {
-        include: { members: true },
-      },
-    },
+    where: { userId },
+    include: { organisation: { include: { members: true } } },
   });
 
-  const teamMembers = memberships.reduce((total, value) => {
-    const eachMembers = value.organisation.members.length ?? 0;
-    return total + Math.max(0, eachMembers - 1);
+  const teamMembers = memberships.reduce((total, membership) => {
+    const orgMembersCount = membership.organisation.members.length;
+    return total + Math.max(0, orgMembersCount - 1);
   }, 0);
 
+  const totalRevenue =
+    (
+      await prisma.invoice.aggregate({
+        _sum: { amount: true },
+        where: {
+          status: "completed",
+          organisation: { members: { some: { userId } } },
+          orgId: orgIdToUse,
+        },
+      })
+    )._sum.amount?.toNumber() ?? 0;
+
+  const [newInvoices, oldInvoices, totalInvoices, totalPending] =
+    await prisma.$transaction([
+      prisma.invoice.count({
+        // new invoices
+        where: {
+          createdAt: { gte: dateRanges.thisMonth.firstDay },
+          orgId: orgIdToUse,
+        },
+      }),
+      prisma.invoice.count({
+        // old invoices
+        where: {
+          createdAt: {
+            gte: dateRanges.prevMonth.firstDay,
+            lt: dateRanges.thisMonth.firstDay,
+          },
+          orgId: orgIdToUse,
+        },
+      }),
+      prisma.invoice.count({ where: { orgId: orgIdToUse } }), //total invoices
+      prisma.invoice.count({
+        //total pending
+        where: {
+          status: "pending",
+          organisation: { members: { some: { userId } } },
+        },
+      }),
+    ]);
+
+  const percentDiff = getPercentDiff(newInvoices, oldInvoices);
+
   return {
-    totalRevenue: 5000.0,
-    totalPending: 178.2,
-    totalInvoices: 20,
+    totalRevenue,
+    totalPending,
+    totalInvoices,
     teamMembers,
-    invoiceSent: 10,
-    activeOrganizations: memberships.length,
+    thisMonth: { sent: newInvoices, percentDiff },
+    activeOrganisations: memberships.length,
   };
 }

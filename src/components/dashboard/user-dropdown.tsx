@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/lib";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { slugifyInitials } from "@/lib/utils";
 
 type AwaitedReturnType<T extends (...args: any) => any> = Awaited<
   ReturnType<T>
@@ -20,14 +21,6 @@ type AwaitedReturnType<T extends (...args: any) => any> = Awaited<
 
 interface UserDropDownProps {
   user: AwaitedReturnType<typeof auth>["user"] & {};
-}
-
-function slugifyInitials(text: string): string {
-  return text
-    .trim()
-    .split(/\s+/) // Split by spaces
-    .map((word) => word[0]?.toUpperCase() || "") // Get the first letter of each word and capitalize it
-    .join(""); // Join them without spaces or hyphens
 }
 
 const UserDropDown: React.FC<UserDropDownProps> = ({ user }) => {
