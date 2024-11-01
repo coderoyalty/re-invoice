@@ -27,6 +27,7 @@ import { toast } from "@/hooks/use-toast";
 import { signIn } from "@/actions/auth";
 import { LoginFormFieldType, loginSchema } from "@/app/_lib/definitions";
 import { PasswordInput } from "@/components/ui/password-input";
+import { GoogleLogoIcon } from "@/components/Google";
 
 export default function LoginForm() {
   const [isLoading, setLoading] = React.useState(false);
@@ -141,7 +142,7 @@ export default function LoginForm() {
                     onClick={() => {}}
                   >
                     {/* TODO: google's icon */}
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
+                    <GoogleLogoIcon className="mr-2 w-5 h-5" />
                     Google
                   </Button>
 

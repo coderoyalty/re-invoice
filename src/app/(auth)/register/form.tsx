@@ -27,6 +27,7 @@ import React from "react";
 import { signUp } from "@/actions/auth";
 import { SignUpFormFieldType, registerSchema } from "@/app/_lib/definitions";
 import { PasswordInput } from "@/components/ui/password-input";
+import { GoogleLogoIcon } from "@/components/Google";
 
 export default function RegistrationForm() {
   const [isLoading, setLoading] = React.useState(false);
@@ -157,7 +158,7 @@ export default function RegistrationForm() {
                     onClick={() => {}}
                   >
                     {/* TODO: google's icon */}
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
+                    <GoogleLogoIcon className="mr-2 w-5 h-5" />
                     Google
                   </Button>
 
