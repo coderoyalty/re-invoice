@@ -56,7 +56,8 @@ const TotalInvoiceCard: React.FC<{
 const InvoiceSentCard: React.FC<{
   value: number;
   percentDiff: number;
-}> = ({ value, percentDiff = 0.0 }) => {
+  lastMonthValue: number;
+}> = ({ value, percentDiff = 0.0, lastMonthValue }) => {
   return (
     <>
       <Card>
@@ -68,7 +69,7 @@ const InvoiceSentCard: React.FC<{
           {/* invoices sent */}
           <div className="text-2xl font-bold">+{value}</div>
           <p className="text-xs text-muted-foreground">
-            {formatWithSign(percentDiff)}% from last month
+            {formatWithSign(percentDiff)}% from last month ({lastMonthValue})
           </p>
         </CardContent>
       </Card>
@@ -168,6 +169,7 @@ export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
         <InvoiceSentCard
           value={data.thisMonth.sent}
           percentDiff={data.thisMonth.percentDiff}
+          lastMonthValue={data.thisMonth.lastMonthValue}
         />
         <ActiveOrgCard value={data.activeOrganisations} />
         <TeamMembersCard value={data.teamMembers} />

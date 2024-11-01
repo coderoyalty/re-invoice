@@ -137,7 +137,7 @@ export async function fetchInvoiceSummary(orgId: string | null = null) {
     totalPending,
     totalInvoices,
     teamMembers,
-    thisMonth: { sent: newInvoices, percentDiff },
+    thisMonth: { sent: newInvoices, percentDiff, lastMonthValue: oldInvoices },
     activeOrganisations: memberships.length,
   };
 }
