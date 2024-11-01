@@ -8,6 +8,7 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
+// TODO: consider using an external provider like: Clerk, KindeAuth, Next.js
 model User {
   id               String    @id @default(uuid())
   displayName      String
@@ -53,7 +54,7 @@ model Organisation {
   businessProfile BusinessProfile?
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   creatorId String
   creator   User   @relation("OrgCreator", fields: [creatorId], references: [id])
@@ -74,7 +75,7 @@ model OrganisationMember {
   orgId  String
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user         User         @relation("UserMemberships", fields: [userId], references: [id])
   organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id])
@@ -91,7 +92,7 @@ model BusinessProfile {
   id String @id @default(uuid())
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   organisationName String
   firstName        String
@@ -116,11 +117,12 @@ enum InvoiceStatus {
   failed
 }
 
+//NOTE: dummy invoice model 
 model Invoice {
   id String @id @default(uuid())
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   amount Decimal
   client String
