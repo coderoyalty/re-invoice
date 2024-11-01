@@ -26,6 +26,7 @@ import React from "react";
 import { toast } from "@/hooks/use-toast";
 import { signIn } from "@/actions/auth";
 import { LoginFormFieldType, loginSchema } from "@/app/_lib/definitions";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function LoginForm() {
   const [isLoading, setLoading] = React.useState(false);
@@ -112,9 +113,9 @@ export default function LoginForm() {
                           </Link>
                         </div>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder="e.g Abcd123@"
-                            type="password"
+                            autoComplete="current-password"
                             {...field}
                           />
                         </FormControl>

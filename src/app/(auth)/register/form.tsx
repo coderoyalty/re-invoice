@@ -26,6 +26,7 @@ import LoadingBtn from "@/components/LoadingBtn";
 import React from "react";
 import { signUp } from "@/actions/auth";
 import { SignUpFormFieldType, registerSchema } from "@/app/_lib/definitions";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function RegistrationForm() {
   const [isLoading, setLoading] = React.useState(false);
@@ -129,9 +130,9 @@ export default function RegistrationForm() {
                           </Link>
                         </div>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder="e.g Abcd123@"
-                            type="password"
+                            autoComplete="new-password"
                             {...field}
                           />
                         </FormControl>
