@@ -15,3 +15,13 @@ export const auth = cache(async () => {
   const result = await session.validateSessionToken(sessionId);
   return result;
 });
+
+export const authUnsafe = async () => {
+  const { user, session } = await auth();
+
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  return { user: user!, session: session! };
+};

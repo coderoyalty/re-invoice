@@ -30,17 +30,17 @@ export async function createAccount(data: AccountProps) {
   return newUser;
 }
 
-type DefaultOrgProps = {
+type CreateOrgProps = {
   userId: string;
   orgName: string;
   businessType: string;
 };
 
-export async function createDefaultOrg({
+export async function createOrganisation({
   userId,
   orgName,
   businessType,
-}: DefaultOrgProps) {
+}: CreateOrgProps) {
   const user = await prisma.user.findUnique({
     where: {
       id: userId,
@@ -54,9 +54,8 @@ export async function createDefaultOrg({
     throw new Error("An account does not exist for the provided user");
   }
 
-  // avoid creating a default organisation if it already exists
-  if (user.defaultOrganisation) {
-    throw new Error("There's already a default organisation for this account");
+  if (!user.emailConfirmedAt) {
+    throw new Error("Your account is not confirmed, request confirmation mail");
   }
 
   // create default organisation
@@ -68,18 +67,20 @@ export async function createDefaultOrg({
     },
   });
 
-  // set the first organisation created by the user as the default organisation
-  const updatedUser = await prisma.user.update({
-    data: {
-      defaultOrganisationId: newOrg.id,
-    },
-    where: {
-      id: user.id,
-    },
-    include: {
-      defaultOrganisation: true,
-    },
-  });
+  // if first organisation created by the user, set as the default organisation
+  if (!user.defaultOrganisation) {
+    await prisma.user.update({
+      data: {
+        defaultOrganisationId: newOrg.id,
+      },
+      where: {
+        id: user.id,
+      },
+      include: {
+        defaultOrganisation: true,
+      },
+    });
+  }
 
   // add the organisation owner as the first member of an organisation
   await prisma.organisationMember.create({
@@ -90,7 +91,6 @@ export async function createDefaultOrg({
   });
 
   return {
-    user: updatedUser,
     org: newOrg,
   };
 }

@@ -14,6 +14,10 @@ export default async function DashboardLayout({
     return redirect("/login");
   }
 
+  if (!user.defaultOrganisation) {
+    return redirect("/onboarding/create-org");
+  }
+
   return (
     <>
       <div className="flex flex-col min-h-screen">
