@@ -2,12 +2,7 @@ import React from "react";
 import Logo from "../Logo";
 import DashboardNav from "./nav";
 import ThemeSwitch from "../ThemeSwitch";
-
-const orgs = [
-  { id: "default", name: "My Organization" },
-  { id: "org1", name: "Client A Inc." },
-  { id: "org2", name: "Client B Ltd." },
-];
+import { Separator } from "../ui/separator";
 
 export default function DashboardHeader() {
   return (
@@ -16,8 +11,11 @@ export default function DashboardHeader() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16 gap-2">
             <Logo />
-            <DashboardNav />
-            <ThemeSwitch />
+            <div className="flex-auto flex items-center h-full py-5 space-x-3">
+              <DashboardNav />
+              <Separator orientation="vertical" />
+              <ThemeSwitch />
+            </div>
           </div>
         </div>
       </header>

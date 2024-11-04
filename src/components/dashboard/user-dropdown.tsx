@@ -25,7 +25,7 @@ const UserDropDown: React.FC<UserDropDownProps> = ({ user }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="cursor-pointer rounded-2xl text-secondary-foreground hover:bg-primary-foreground px-3 py-2 h-auto flex items-center space-x-2">
+        <div className="cursor-pointer rounded-2xl text-secondary-foreground bg-primary-foreground px-3 py-2 h-auto flex items-center space-x-2">
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
               <AvatarImage
