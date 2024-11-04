@@ -8,6 +8,7 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
+// TODO: consider using an external provider like: Clerk, KindeAuth, Next.js
 model User {
   id               String    @id @default(uuid())
   displayName      String
@@ -20,8 +21,15 @@ model User {
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
 
-  sessions      Session[]
-  organisations Organisation[]
+  defaultOrganisationId String?
+  defaultOrganisation   Organisation? @relation("DefaultOrg", references: [id], fields: [defaultOrganisationId])
+
+  sessions    Session[]
+  createdOrgs Organisation[]       @relation("OrgCreator")
+  memberships OrganisationMember[] @relation("UserMemberships")
+  invoices    Invoice[]
+
+  @@index([defaultOrganisationId])
 }
 
 model Session {
@@ -42,6 +50,87 @@ model Organisation {
   id   String @id @default(uuid())
   name String
 
+  businessType    BusinessType     @default(individual)
+  businessProfile BusinessProfile?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   creatorId String
-  creator   User   @relation(fields: [creatorId], references: [id])
+  creator   User   @relation("OrgCreator", fields: [creatorId], references: [id])
+
+  defaultUsers User[] @relation("DefaultOrg")
+
+  members OrganisationMember[] @relation("OrganisationMembers")
+
+  invoices Invoice[]
+
+  @@index([creatorId])
+}
+
+model OrganisationMember {
+  id String @id @default(uuid())
+
+  userId String
+  orgId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User         @relation("UserMemberships", fields: [userId], references: [id])
+  organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id])
+
+  @@index([userId, orgId])
+}
+
+enum BusinessType {
+  individual
+  organisation
+}
+
+model BusinessProfile {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisationName String
+  firstName        String
+  lastName         String
+  websiteUrl       String?
+  emailAddress     String
+
+  addressLine1 String
+  addressLine2 String?
+  postalCode   String
+  city         String
+  state        String
+  country      String
+
+  orgId        String       @unique
+  organisation Organisation @relation(references: [id], fields: [orgId])
+}
+
+enum InvoiceStatus {
+  pending
+  completed
+  failed
+}
+
+//NOTE: dummy invoice model 
+model Invoice {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  amount Decimal
+  client String
+  status InvoiceStatus @default(pending)
+
+  creatorId String
+  creator   User   @relation(references: [id], fields: [creatorId])
+
+  orgId        String
+  organisation Organisation @relation(references: [id], fields: [orgId])
 }

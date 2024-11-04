@@ -20,32 +20,27 @@ import { Input } from "@/components/ui/input";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingBtn from "@/components/LoadingBtn";
 import React from "react";
 import { toast } from "@/hooks/use-toast";
-import { signIn } from "@/app/actions/auth";
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-type FormFieldType = z.infer<typeof formSchema>;
+import { signIn } from "@/actions/auth";
+import { LoginFormFieldType, loginSchema } from "@/app/_lib/definitions";
+import { PasswordInput } from "@/components/ui/password-input";
+import { GoogleLogoIcon } from "@/components/Google";
 
 export default function LoginForm() {
   const [isLoading, setLoading] = React.useState(false);
 
-  const form = useForm<FormFieldType>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<LoginFormFieldType>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit: SubmitHandler<FormFieldType> = async (data) => {
+  const onSubmit: SubmitHandler<LoginFormFieldType> = async (data) => {
     try {
       setLoading(true);
       const formData = new FormData();
@@ -119,9 +114,9 @@ export default function LoginForm() {
                           </Link>
                         </div>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder="e.g Abcd123@"
-                            type="password"
+                            autoComplete="current-password"
                             {...field}
                           />
                         </FormControl>
@@ -147,7 +142,7 @@ export default function LoginForm() {
                     onClick={() => {}}
                   >
                     {/* TODO: google's icon */}
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
+                    <GoogleLogoIcon className="mr-2 w-5 h-5" />
                     Google
                   </Button>
 

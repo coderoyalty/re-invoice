@@ -1,43 +1,37 @@
-"use client";
 import React from "react";
 import UserDropDown from "@/components/dashboard/user-dropdown";
-import RecentInvoiceSkeleton from "@/components/ui/skeletons/recent-invoice";
 import RecentInvoice from "../../components/dashboard/recent-invoice";
 import SummaryCards from "@/components/dashboard/summary-cards";
-import SummaryCardsSkeleton from "@/components/ui/skeletons/summary-cards";
+import { auth } from "@/lib";
+import { redirect } from "next/navigation";
 
-const orgs = [
-  { id: "default", name: "My Organization" },
-  { id: "org1", name: "Client A Inc." },
-  { id: "org2", name: "Client B Ltd." },
-  { id: "org2", name: "Client C Inc." },
-];
+export default async function Dashboard() {
+  const { user } = await auth();
 
-export default function Dashboard() {
-  const [selectedOrg, setSelectedOrg] = React.useState("default");
+  if (!user) {
+    return redirect("/login");
+  }
 
   return (
     <>
       <div className="max-w-5xl mx-auto space-y-8">
         <div className="w-full flex items-center">
           <div className="flex-grow flex flex-col">
-            <h1 className="text-2xl font-bold">Welcome Back!</h1>
-            <span className="text-muted-foreground">
+            <h1 className="text-xl md:text-2xl xl:text-3xl font-bold">
+              Welcome Back!
+            </h1>
+            <span className="text-muted-foreground max-[340px]:sr-only">
               Here's an insight of your data for this month
             </span>
           </div>
           {/* avatar */}
           <div className="flex-none">
-            <UserDropDown />
+            <UserDropDown user={user} />
           </div>
         </div>
-        <div className="bg-primary-foreground p-4 rounded-md shadow-md">
-          <React.Suspense fallback={<SummaryCardsSkeleton />}>
-            <SummaryCards />
-          </React.Suspense>
-          <React.Suspense fallback={<RecentInvoiceSkeleton />}>
-            <RecentInvoice organizations={orgs} selectedOrg={selectedOrg} />
-          </React.Suspense>
+        <div className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
+          <SummaryCards defaultOrg={user.defaultOrganisation?.id ?? ""} />
+          <RecentInvoice defaultOrg={user.defaultOrganisation?.id ?? ""} />
         </div>
       </div>
     </>

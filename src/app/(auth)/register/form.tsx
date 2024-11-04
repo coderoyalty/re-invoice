@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/form";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Card,
   CardContent,
@@ -25,21 +24,16 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { toast } from "@/hooks/use-toast";
 import LoadingBtn from "@/components/LoadingBtn";
 import React from "react";
-import { signUp } from "@/app/actions/auth";
-
-const formSchema = z.object({
-  displayName: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-type FormFieldType = z.infer<typeof formSchema>;
+import { signUp } from "@/actions/auth";
+import { SignUpFormFieldType, registerSchema } from "@/app/_lib/definitions";
+import { PasswordInput } from "@/components/ui/password-input";
+import { GoogleLogoIcon } from "@/components/Google";
 
 export default function RegistrationForm() {
   const [isLoading, setLoading] = React.useState(false);
 
-  const form = useForm<FormFieldType>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SignUpFormFieldType>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       displayName: "",
       email: "",
@@ -47,7 +41,7 @@ export default function RegistrationForm() {
     },
   });
 
-  const onSubmit: SubmitHandler<FormFieldType> = async (data) => {
+  const onSubmit: SubmitHandler<SignUpFormFieldType> = async (data) => {
     const formData = new FormData();
 
     for (const [name, value] of Object.entries(data)) {
@@ -137,9 +131,9 @@ export default function RegistrationForm() {
                           </Link>
                         </div>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder="e.g Abcd123@"
-                            type="password"
+                            autoComplete="new-password"
                             {...field}
                           />
                         </FormControl>
@@ -164,7 +158,7 @@ export default function RegistrationForm() {
                     onClick={() => {}}
                   >
                     {/* TODO: google's icon */}
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
+                    <GoogleLogoIcon className="mr-2 w-5 h-5" />
                     Google
                   </Button>
 
