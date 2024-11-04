@@ -10,8 +10,7 @@ import {
   generateSessionToken,
   invalidateSession,
 } from "@/lib/server/session";
-import { createAccount, createDefaultOrg } from "@/lib/users/data";
-import { extractFirstName } from "@/lib/utils";
+import { createAccount } from "@/lib/users/data";
 import { verifyPassword } from "@/utils/password";
 import { redirect } from "next/navigation";
 
@@ -26,12 +25,6 @@ export async function signUp(formData: FormData) {
   };
 
   const user = await createAccount(data);
-
-  await createDefaultOrg({
-    userId: user.id,
-    businessType: "individual",
-    orgName: `${extractFirstName(user.displayName)}\`s org`,
-  });
 
   redirect("/login");
 }
