@@ -24,9 +24,14 @@ export async function signUp(formData: FormData) {
     password: password! as string,
   };
 
-  const user = await createAccount(data);
-
-  redirect("/login");
+  try {
+    const user = await createAccount(data);
+    return { user };
+  } catch (err: any) {
+    return {
+      error: err.message as string,
+    };
+  }
 }
 
 export async function signIn(formData: FormData) {
@@ -45,16 +50,16 @@ export async function signIn(formData: FormData) {
   });
 
   if (result === null) {
-    throw new Error("Incorrect email or password");
+    return { error: "Incorrect email or password" };
   }
 
   if (!result.emailConfirmedAt) {
-    throw new Error("Email address has not been confirmed");
+    return { error: "Email address has not been confirmed" };
   }
 
   const validPassword = await verifyPassword(data.password, result.password);
   if (!validPassword) {
-    throw new Error("Incorrect email or password");
+    return { error: "Incorrect email or password" };
   }
 
   const userAgent = "";
@@ -68,7 +73,9 @@ export async function signIn(formData: FormData) {
 
   setSessionCookie(token, session.expiresAt);
 
-  redirect("/dashboard");
+  return {
+    session: true,
+  };
 }
 
 export async function signOut() {
