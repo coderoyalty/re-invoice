@@ -141,7 +141,6 @@ export default function LoginForm() {
                     disabled
                     onClick={() => {}}
                   >
-                    {/* TODO: google's icon */}
                     <GoogleLogoIcon className="mr-2 w-5 h-5" />
                     Google
                   </Button>
