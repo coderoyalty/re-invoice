@@ -28,8 +28,10 @@ import { signIn } from "@/actions/auth";
 import { LoginFormFieldType, loginSchema } from "@/app/_lib/definitions";
 import { PasswordInput } from "@/components/ui/password-input";
 import { GoogleLogoIcon } from "@/components/Google";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [isLoading, setLoading] = React.useState(false);
 
   const form = useForm<LoginFormFieldType>({
@@ -41,27 +43,27 @@ export default function LoginForm() {
   });
 
   const onSubmit: SubmitHandler<LoginFormFieldType> = async (data) => {
-    try {
-      setLoading(true);
-      const formData = new FormData();
+    setLoading(true);
+    const formData = new FormData();
 
-      for (const [name, value] of Object.entries(data)) {
-        formData.append(name, value);
-      }
+    for (const [name, value] of Object.entries(data)) {
+      formData.append(name, value);
+    }
 
-      await signIn(formData);
+    const { error, session } = await signIn(formData);
 
+    if (session) {
       toast({
         title: "Login Successfully",
       });
-    } catch (err: any) {
+      router.push("/dashboard");
+    } else {
       toast({
         title: "Something went wrong",
-        description: err.message,
+        description: error,
       });
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

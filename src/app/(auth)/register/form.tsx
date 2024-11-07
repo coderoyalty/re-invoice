@@ -28,8 +28,11 @@ import { signUp } from "@/actions/auth";
 import { SignUpFormFieldType, registerSchema } from "@/app/_lib/definitions";
 import { PasswordInput } from "@/components/ui/password-input";
 import { GoogleLogoIcon } from "@/components/Google";
+import { useRouter } from "next/navigation";
 
 export default function RegistrationForm() {
+  const router = useRouter();
+
   const [isLoading, setLoading] = React.useState(false);
 
   const form = useForm<SignUpFormFieldType>({
@@ -48,21 +51,24 @@ export default function RegistrationForm() {
       formData.append(name, value);
     }
 
-    try {
-      setLoading(true);
-      await signUp(formData);
+    setLoading(true);
+    const res = await signUp(formData);
+
+    if (res.user) {
       toast({
         title: "Account Created Successfully",
         description: "Check your email to verify your account",
       });
-    } catch (err: any) {
+
+      router.push("/login");
+    } else {
       toast({
         title: "Unable to Create Account",
-        description: err.message,
+        description: res.error,
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
