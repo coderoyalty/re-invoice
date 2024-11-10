@@ -14,7 +14,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Plus, Download, Users } from "lucide-react";
+import { Plus, Download, Users, Cross, Ellipsis, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { fetchRecentInvoices } from "@/lib/dashboard/data";
@@ -22,6 +22,42 @@ import { AwaitedReturnType } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import RecentInvoiceSkeleton from "../ui/skeletons/recent-invoice";
 import Link from "next/link";
+import { Badge } from "../ui/badge";
+
+const statusToBadge = (
+  status: AwaitedReturnType<typeof fetchRecentInvoices>[0]["status"]
+) => {
+  switch (status) {
+    case "completed":
+      return (
+        <Badge className="bg-green-500 hover:bg-green-600 lowercase px-1 lg:px-2">
+          Completed
+          <Check className="ml-1 h-4 w-4" />
+        </Badge>
+      );
+    case "failed":
+      return (
+        <Badge className="bg-red-600 hover:bg-red-700 lowercase px-1 lg:px-2">
+          Failed
+          <Cross className="ml-1 h-4 w-4" />
+        </Badge>
+      );
+    case "pending":
+      return (
+        <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-1 lg:px-2">
+          Pending
+          <Ellipsis className="ml-1 h-4 w-4" />
+        </Badge>
+      );
+    default:
+      return (
+        <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-1 lg:px-2">
+          Pending
+          <Ellipsis className="ml-1 h-4 w-4" />
+        </Badge>
+      );
+  }
+};
 
 export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
   const [invoices, setInvoices] = React.useState<
@@ -102,7 +138,9 @@ export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
                         {inv.shortId}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-center">{inv.status}</TableCell>
+                    <TableCell className="text-center">
+                      {statusToBadge(inv.status)}
+                    </TableCell>
                     <TableCell>{inv.client}</TableCell>
                     <TableCell className="text-right">${inv.amount}</TableCell>
                   </TableRow>
