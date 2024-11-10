@@ -1,5 +1,6 @@
 import { hashPassword } from "@/utils/password";
 import prisma from "../prisma";
+import { PublicError } from "@/use-cases/errors";
 
 type AccountProps = {
   displayName: string;
@@ -32,14 +33,14 @@ export async function createAccount(data: AccountProps) {
 
 type CreateOrgProps = {
   userId: string;
-  orgName: string;
-  businessType: string;
+  name: string;
+  type: string;
 };
 
 export async function createOrganisation({
   userId,
-  orgName,
-  businessType,
+  name,
+  type,
 }: CreateOrgProps) {
   const user = await prisma.user.findUnique({
     where: {
@@ -51,19 +52,21 @@ export async function createOrganisation({
   });
 
   if (!user) {
-    throw new Error("An account does not exist for the provided user");
+    throw new PublicError("An account does not exist for the provided user");
   }
 
   if (!user.emailConfirmedAt) {
-    throw new Error("Your account is not confirmed, request confirmation mail");
+    throw new PublicError(
+      "Your account is not confirmed, request confirmation mail"
+    );
   }
 
-  // create default organisation
+  // create organisation
   const newOrg = await prisma.organisation.create({
     data: {
-      name: orgName,
+      name,
       creatorId: user.id,
-      businessType: businessType as any,
+      businessType: type as any,
     },
   });
 
