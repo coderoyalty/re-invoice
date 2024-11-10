@@ -1,8 +1,8 @@
-import { authUnsafe } from "@/lib";
+import { assertAuth } from "@/lib";
 import CreateOrgForm from "./form";
 
 export default async function () {
-  const { user } = await authUnsafe();
+  const { user } = await assertAuth();
 
   return (
     <>

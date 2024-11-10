@@ -24,16 +24,30 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { toast } from "@/hooks/use-toast";
 import LoadingBtn from "@/components/LoadingBtn";
 import React from "react";
-import { signUp } from "@/actions/auth";
 import { SignUpFormFieldType, registerSchema } from "@/app/_lib/definitions";
 import { PasswordInput } from "@/components/ui/password-input";
 import { GoogleLogoIcon } from "@/components/Google";
-import { useRouter } from "next/navigation";
+import { useServerAction } from "zsa-react";
+import { registerAction } from "./actions";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 export default function RegistrationForm() {
-  const router = useRouter();
-
-  const [isLoading, setLoading] = React.useState(false);
+  const { execute, isPending, error } = useServerAction(registerAction, {
+    onSuccess() {
+      toast({
+        title: "Hurray! It was a success!",
+        description: "We've created your account for you",
+      });
+    },
+    onError({ err }) {
+      toast({
+        title: "Unable to Create Account",
+        description: err.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const form = useForm<SignUpFormFieldType>({
     resolver: zodResolver(registerSchema),
@@ -44,31 +58,8 @@ export default function RegistrationForm() {
     },
   });
 
-  const onSubmit: SubmitHandler<SignUpFormFieldType> = async (data) => {
-    const formData = new FormData();
-
-    for (const [name, value] of Object.entries(data)) {
-      formData.append(name, value);
-    }
-
-    setLoading(true);
-    const res = await signUp(formData);
-
-    if (res.user) {
-      toast({
-        title: "Account Created Successfully",
-        description: "Check your email to verify your account",
-      });
-
-      router.push("/login");
-    } else {
-      toast({
-        title: "Unable to Create Account",
-        description: res.error,
-      });
-    }
-
-    setLoading(false);
+  const onSubmit: SubmitHandler<SignUpFormFieldType> = (values) => {
+    execute(values);
   };
 
   return (
@@ -149,7 +140,7 @@ export default function RegistrationForm() {
                   )}
                 />
                 <LoadingBtn
-                  loading={isLoading}
+                  loading={isPending}
                   type="submit"
                   className="w-full"
                 >
@@ -193,6 +184,13 @@ export default function RegistrationForm() {
                 </Link>
               </div>
             </CardFooter>
+            {error && (
+              <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Uhoh, we couldn&apos;t log you in</AlertTitle>
+                <AlertDescription>{error.message}</AlertDescription>
+              </Alert>
+            )}
           </form>
         </Card>
       </Form>

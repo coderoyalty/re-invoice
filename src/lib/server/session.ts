@@ -2,6 +2,7 @@ import type { User, Session } from "@prisma/client";
 import { base32, encodeHex } from "oslo/encoding";
 import { sha256 } from "oslo/crypto";
 import prisma from "../prisma";
+import { setSessionCookie } from "./cookies";
 
 export function generateSessionToken() {
   const bytes = new Uint8Array(20);
@@ -98,6 +99,16 @@ export async function invalidateSession(token: string): Promise<void> {
       id: sessionId,
     },
   });
+}
+
+export async function setSession(user: string) {
+  const token = generateSessionToken();
+  const session = await createSession(token, user, {
+    userAgent: "", //TODO:
+    ipAddress: "",
+  });
+
+  setSessionCookie(token, session.expiresAt);
 }
 
 export type SessionInvalidationResult = Awaited<
