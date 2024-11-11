@@ -138,13 +138,13 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
 
               <TableBody>
                 {invoices.map((inv) => (
-                  <TableRow key={inv.shortId}>
-                    <TableCell className="font-medium text-center">
+                  <TableRow key={inv.id}>
+                    <TableCell className="font-medium text-center max-w-[10ch] overflow-x-hidden text-ellipsis whitespace-nowrap">
                       <Link
                         className="underline-offset-4 hover:underline"
                         href={`/dashboard/invoices/${inv.id}`}
                       >
-                        {inv.shortId}
+                        {inv.id}
                       </Link>
                     </TableCell>
                     <TableCell className="text-center">
