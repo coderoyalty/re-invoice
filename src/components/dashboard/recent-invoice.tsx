@@ -14,8 +14,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Plus, Download, Users, Cross, Ellipsis, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Cross, Ellipsis, Check } from "lucide-react";
 import React from "react";
 import { fetchRecentInvoices } from "@/lib/dashboard/data";
 import { AwaitedReturnType } from "@/lib/types";
@@ -30,28 +29,28 @@ const statusToBadge = (
   switch (status) {
     case "completed":
       return (
-        <Badge className="bg-green-500 hover:bg-green-600 lowercase px-1 lg:px-2">
+        <Badge className="bg-green-500 hover:bg-green-600 lowercase px-2">
           Completed
           <Check className="ml-1 h-4 w-4" />
         </Badge>
       );
     case "failed":
       return (
-        <Badge className="bg-red-600 hover:bg-red-700 lowercase px-1 lg:px-2">
+        <Badge className="bg-red-600 hover:bg-red-700 lowercase px-2">
           Failed
           <Cross className="ml-1 h-4 w-4" />
         </Badge>
       );
     case "pending":
       return (
-        <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-1 lg:px-2">
+        <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-2">
           Pending
           <Ellipsis className="ml-1 h-4 w-4" />
         </Badge>
       );
     default:
       return (
-        <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-1 lg:px-2">
+        <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-2">
           Pending
           <Ellipsis className="ml-1 h-4 w-4" />
         </Badge>
@@ -59,7 +58,17 @@ const statusToBadge = (
   }
 };
 
-export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
+interface RecentInvoiceTableProps
+  extends React.ComponentPropsWithRef<typeof Card> {
+  defaultOrg: string;
+}
+
+const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
+  defaultOrg,
+  ...props
+}: {
+  defaultOrg: string;
+}) => {
   const [invoices, setInvoices] = React.useState<
     AwaitedReturnType<typeof fetchRecentInvoices>
   >([]);
@@ -101,20 +110,20 @@ export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
   }, [currentOrg]);
 
   if (state.pending) {
-    return <RecentInvoiceSkeleton />;
+    return <RecentInvoiceSkeleton {...props} />;
   }
 
   return (
     <>
-      <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="md:col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Invoices</CardTitle>
-            <CardDescription>
-              You have created {invoices.length} invoices this month.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+      <Card {...props}>
+        <CardHeader>
+          <CardTitle>Recent Invoices</CardTitle>
+          <CardDescription>
+            You have created {invoices.length} invoices this month.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -129,13 +138,13 @@ export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
 
               <TableBody>
                 {invoices.map((inv) => (
-                  <TableRow key={inv.shortId}>
-                    <TableCell className="font-medium text-center">
+                  <TableRow key={inv.id}>
+                    <TableCell className="font-medium text-center max-w-[10ch] overflow-x-hidden text-ellipsis whitespace-nowrap">
                       <Link
                         className="underline-offset-4 hover:underline"
                         href={`/dashboard/invoices/${inv.id}`}
                       >
-                        {inv.shortId}
+                        {inv.id}
                       </Link>
                     </TableCell>
                     <TableCell className="text-center">
@@ -147,26 +156,11 @@ export default function RecentInvoice({ defaultOrg }: { defaultOrg: string }) {
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-        <Card className="md:col-span-4 lg:col-span-3 self-start lg:top-20 lg:sticky">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Manage invoices and team.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <Button className="w-full">
-              <Plus className="mr-2 h-4 w-4" /> Create New Invoice
-            </Button>
-            <Button variant="outline" className="w-full">
-              <Download className="mr-2 h-4 w-4" /> Download Reports
-            </Button>
-            <Button variant="outline" className="w-full">
-              <Users className="mr-2 h-4 w-4" /> Invite Team Member
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
-}
+};
+
+export default RecentInvoiceTable;

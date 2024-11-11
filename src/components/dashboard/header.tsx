@@ -3,8 +3,13 @@ import Logo from "../Logo";
 import DashboardNav from "./nav";
 import ThemeSwitch from "../ThemeSwitch";
 import { Separator } from "../ui/separator";
+import UserDropDown, { UserDropDownProps } from "./user-dropdown";
 
-export default function DashboardHeader() {
+export default function DashboardHeader({
+  user,
+}: {
+  user: UserDropDownProps["user"];
+}) {
   return (
     <>
       <header className="top-0 sticky bg-transparent gap-2 bg-opacity-30 backdrop-blur-md border-b border-white border-opacity-20 shadow-md z-50">
@@ -13,6 +18,8 @@ export default function DashboardHeader() {
             <Logo />
             <div className="flex-auto flex items-center h-full py-5 space-x-3">
               <DashboardNav />
+              <Separator orientation="vertical" />
+              <UserDropDown user={user} />
               <Separator orientation="vertical" />
               <ThemeSwitch />
             </div>

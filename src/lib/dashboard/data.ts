@@ -23,12 +23,48 @@ export async function fetchUserOrgs() {
       name: true,
     },
     take: 10,
+    orderBy: {
+      createdAt: "asc",
+    },
   });
 
   return {
     organisations,
     defaultOrg: user.defaultOrganisation,
   };
+}
+
+export async function fetchOrgsWithDetails() {
+  const { user } = await auth();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
+  const orgMembers = await prisma.organisationMember.findMany({
+    where: {
+      userId: user.id,
+    },
+    include: {
+      organisation: {
+        include: {
+          members: true,
+        },
+      },
+    },
+  });
+
+  return orgMembers.map((orgMember) => {
+    const membersCount = orgMember.organisation.members.length;
+    const result = {
+      ...orgMember.organisation,
+      joinedAt: orgMember.createdAt,
+      members: membersCount,
+      owner: orgMember.organisation.creatorId === user.id,
+    };
+
+    return result;
+  });
 }
 
 export async function fetchRecentInvoices(orgId: string) {
