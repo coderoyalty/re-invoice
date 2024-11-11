@@ -1,8 +1,9 @@
 import { cache } from "react";
 import * as session from "@/lib/server/session";
 import { getSessionCookie } from "@/lib/server/cookies";
+import { AuthenticationError } from "@/use-cases/errors";
 
-export const auth = cache(async () => {
+export const getCurrentUser = async () => {
   const sessionId = getSessionCookie();
 
   if (!sessionId) {
@@ -14,14 +15,20 @@ export const auth = cache(async () => {
 
   const result = await session.validateSessionToken(sessionId);
   return result;
+};
+
+export const auth = cache(async () => {
+  const { user, session } = await getCurrentUser();
+
+  return { user, session };
 });
 
-export const authUnsafe = async () => {
-  const { user, session } = await auth();
+export const assertAuth = cache(async () => {
+  const { user, session } = await getCurrentUser();
 
-  if (!user) {
-    throw new Error("User not authenticated");
+  if (!user || !session) {
+    throw new AuthenticationError();
   }
 
-  return { user: user!, session: session! };
-};
+  return { user, session };
+});

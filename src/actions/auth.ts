@@ -1,18 +1,10 @@
 "use server";
 import prisma from "@/lib/prisma";
-import {
-  deleteSessionCookie,
-  getSessionCookie,
-  setSessionCookie,
-} from "@/lib/server/cookies";
-import {
-  createSession,
-  generateSessionToken,
-  invalidateSession,
-} from "@/lib/server/session";
+import { deleteSessionCookie, getSessionCookie } from "@/lib/server/cookies";
+import { invalidateSession, setSession } from "@/lib/server/session";
 import { createAccount } from "@/lib/users/data";
+import { LoginError } from "@/use-cases/errors";
 import { verifyPassword } from "@/utils/password";
-import { redirect } from "next/navigation";
 
 export async function signUp(formData: FormData) {
   const { displayName, email, password } = Object.fromEntries(
@@ -34,12 +26,7 @@ export async function signUp(formData: FormData) {
   }
 }
 
-export async function signIn(formData: FormData) {
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
-
+export async function signIn(data: { email: string; password: string }) {
   const result = await prisma.user.findUnique({
     where: {
       email: data.email,
@@ -50,32 +37,18 @@ export async function signIn(formData: FormData) {
   });
 
   if (result === null) {
-    return { error: "Incorrect email or password" };
+    throw new LoginError();
   }
 
   if (!result.emailConfirmedAt) {
-    return { error: "Email address has not been confirmed" };
+    throw new LoginError("Email address has not been confirmed");
   }
 
   const validPassword = await verifyPassword(data.password, result.password);
   if (!validPassword) {
-    return { error: "Incorrect email or password" };
+    throw new LoginError("Email address has not been confirmed");
   }
-
-  const userAgent = "";
-  const ipAddress = "";
-
-  const token = generateSessionToken();
-  const session = await createSession(token, result.id, {
-    userAgent,
-    ipAddress,
-  });
-
-  setSessionCookie(token, session.expiresAt);
-
-  return {
-    session: true,
-  };
+  return result.id;
 }
 
 export async function signOut() {

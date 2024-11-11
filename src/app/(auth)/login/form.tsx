@@ -24,16 +24,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingBtn from "@/components/LoadingBtn";
 import React from "react";
 import { toast } from "@/hooks/use-toast";
-import { signIn } from "@/actions/auth";
 import { LoginFormFieldType, loginSchema } from "@/app/_lib/definitions";
 import { PasswordInput } from "@/components/ui/password-input";
 import { GoogleLogoIcon } from "@/components/Google";
-import { useRouter } from "next/navigation";
+import { useServerAction } from "zsa-react";
+import { loginAction } from "./actions";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 export default function LoginForm() {
-  const router = useRouter();
-  const [isLoading, setLoading] = React.useState(false);
-
   const form = useForm<LoginFormFieldType>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -42,28 +41,18 @@ export default function LoginForm() {
     },
   });
 
-  const onSubmit: SubmitHandler<LoginFormFieldType> = async (data) => {
-    setLoading(true);
-    const formData = new FormData();
-
-    for (const [name, value] of Object.entries(data)) {
-      formData.append(name, value);
-    }
-
-    const { error, session } = await signIn(formData);
-
-    if (session) {
-      toast({
-        title: "Login Successfully",
-      });
-      router.push("/dashboard");
-    } else {
+  const { execute, isPending, error } = useServerAction(loginAction, {
+    onError({ err }) {
       toast({
         title: "Something went wrong",
-        description: error,
+        description: err.message,
+        variant: "destructive",
       });
-    }
-    setLoading(false);
+    },
+  });
+
+  const onSubmit: SubmitHandler<LoginFormFieldType> = (data) => {
+    execute(data);
   };
 
   return (
@@ -129,7 +118,7 @@ export default function LoginForm() {
                 />
 
                 <LoadingBtn
-                  loading={isLoading}
+                  loading={isPending}
                   type="submit"
                   className="w-full"
                 >
@@ -173,6 +162,13 @@ export default function LoginForm() {
                 </Link>
               </div>
             </CardFooter>
+            {error && (
+              <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Uhoh, we couldn&apos;t log you in</AlertTitle>
+                <AlertDescription>{error.message}</AlertDescription>
+              </Alert>
+            )}
           </form>
         </Card>
       </Form>

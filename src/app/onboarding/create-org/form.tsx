@@ -1,5 +1,4 @@
 "use client";
-import { createOrg } from "@/actions/org";
 import LoadingBtn from "@/components/LoadingBtn";
 import {
   Card,
@@ -25,12 +24,12 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { auth } from "@/lib";
-import { extractFirstName } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import { useServerAction } from "zsa-react";
+import { defaultOrgAction } from "./actions";
 
 const formSchema = z.object({
   name: z.string().min(2).max(40),
@@ -44,50 +43,32 @@ type AwaitedReturnTypeNonNullable<
 
 type FormFieldType = z.infer<typeof formSchema>;
 
-type DefaultOrgFormProps = {
-  user: AwaitedReturnTypeNonNullable<typeof auth, "user">;
-};
-
-export default function CreateOrgForm({ user }: DefaultOrgFormProps) {
-  const [isLoading, setLoading] = React.useState(false);
+export default function CreateOrgForm() {
   const form = useForm<FormFieldType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: `${extractFirstName(user.displayName)}'s organisation`,
+      name: `my organisation`,
       type: "individual",
     },
   });
 
-  const onSubmit: SubmitHandler<FormFieldType> = async (data) => {
-    try {
-      setLoading(true);
-
-      const formData = new FormData();
-
-      for (const [name, value] of Object.entries({
-        ...data,
-        userId: user.id,
-      })) {
-        formData.append(name, value);
-      }
-
-      const res = await fetch("/api/organisations", {
-        method: "POST",
-        body: formData,
-      });
-
+  const { execute, isPending } = useServerAction(defaultOrgAction, {
+    onSuccess() {
       toast({
         title: "Hurray, we did it 🙌",
         description: "Congrats, You've created your first organisation",
       });
-    } catch (err: any) {
+    },
+    onError({ err }) {
       toast({
         title: "We encountered an error",
         description: err.message,
       });
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const onSubmit: SubmitHandler<FormFieldType> = (data) => {
+    execute(data);
   };
 
   return (
@@ -157,7 +138,7 @@ export default function CreateOrgForm({ user }: DefaultOrgFormProps) {
                 />
 
                 <LoadingBtn
-                  loading={isLoading}
+                  loading={isPending}
                   type="submit"
                   className="w-full"
                 >
