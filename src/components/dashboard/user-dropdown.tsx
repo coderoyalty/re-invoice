@@ -48,14 +48,16 @@ const UserDropDown: React.FC<UserDropDownProps> = ({ user }) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={"/dashboard"}>Dashboard</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={"/dashboard/org"}>Manage Organizations</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>Account Settings</DropdownMenuItem>
-        <DropdownMenuItem className="hover:bg-red-600" asChild>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          Account Settings
+        </DropdownMenuItem>
+        <DropdownMenuItem className="hover:bg-red-600 cursor-pointer" asChild>
           <Link
             href={"/"}
             onClick={async (e) => {

@@ -23,6 +23,9 @@ export async function fetchUserOrgs() {
       name: true,
     },
     take: 10,
+    orderBy: {
+      createdAt: "asc",
+    },
   });
 
   return {
@@ -55,7 +58,9 @@ export async function fetchOrgsWithDetails() {
     const membersCount = orgMember.organisation.members.length;
     const result = {
       ...orgMember.organisation,
+      joinedAt: orgMember.createdAt,
       members: membersCount,
+      owner: orgMember.organisation.creatorId === user.id,
     };
 
     return result;

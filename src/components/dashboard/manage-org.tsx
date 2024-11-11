@@ -42,6 +42,7 @@ const ManageOrgCard = async () => {
                     Members
                   </TableHead>
                   <TableHead>Date Created</TableHead>
+                  <TableHead>Date Joined</TableHead>
                   <TableHead className="text-center">Business Type</TableHead>
                 </TableRow>
               </TableHeader>
@@ -51,13 +52,22 @@ const ManageOrgCard = async () => {
                     <TableCell className="font-medium">
                       <Link href={`/dashboard/org/${org.id}`}>{org.name}</Link>
                       <div className="sm:hidden text-sm text-muted-foreground">
-                        Admin • {org.members} members
+                        {org.owner ? (
+                          <Badge className="px-2 bg-fuchsia-500">Creator</Badge>
+                        ) : (
+                          "Member"
+                        )}{" "}
+                        • {org.members} members
                         {/*TODO: add role */}
                       </div>
                     </TableCell>
 
                     <TableCell className="hidden sm:table-cell">
-                      Admin
+                      {org.owner ? (
+                        <Badge className="px-2 bg-fuchsia-500">Creator</Badge>
+                      ) : (
+                        "Member"
+                      )}
                     </TableCell>
 
                     <TableCell className="hidden sm:table-cell">
@@ -65,6 +75,7 @@ const ManageOrgCard = async () => {
                     </TableCell>
 
                     <TableCell>{org.createdAt.toLocaleString()}</TableCell>
+                    <TableCell>{org.joinedAt.toLocaleString()}</TableCell>
                     <TableCell className="text-center">
                       <Badge
                         className={cn(
