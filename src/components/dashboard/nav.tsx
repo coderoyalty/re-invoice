@@ -10,8 +10,7 @@ const DashboardNav: React.FC<{}> = async () => {
   const { organisations, defaultOrg } = await fetchOrgs();
 
   if (!defaultOrg) {
-    //TODO: create /create-org route
-    return redirect("/create-org");
+    return redirect("/onboarding");
   }
 
   return (

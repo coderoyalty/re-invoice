@@ -15,7 +15,7 @@ export default async function DashboardLayout({
   }
 
   if (!user.defaultOrganisation) {
-    return redirect("/onboarding/create-org");
+    return redirect("/onboarding/");
   }
 
   return (
