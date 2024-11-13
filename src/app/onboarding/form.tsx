@@ -446,7 +446,7 @@ const OnboardingForm = () => {
 
   return (
     <div className="space-y-8 max-w-sm sm:max-w-lg">
-      <Stepper amount={3} currentStep={index} />
+      <Stepper amount={2} currentStep={index} />
       {index === 1 && (
         <DefaultOrgForm
           data={{ name: data.name, type: data.type }}
