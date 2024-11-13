@@ -164,8 +164,6 @@ const BusinessProfileForm = ({
     defaultValues: data,
   });
 
-  const formValues = form.watch();
-
   const handleSubmit: SubmitHandler<typeof data> = (data) => {
     updateData((value) => {
       return {
@@ -379,6 +377,7 @@ const BusinessProfileForm = ({
                   <LoadingBtn
                     variant={"outline"}
                     onClick={() => {
+                      const formValues = form.getValues();
                       updateData((value) => ({ ...value, ...formValues }));
                       gotoPrevious();
                     }}
