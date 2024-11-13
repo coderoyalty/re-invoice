@@ -164,8 +164,6 @@ const BusinessProfileForm = ({
     defaultValues: data,
   });
 
-  const formValues = form.watch();
-
   const handleSubmit: SubmitHandler<typeof data> = (data) => {
     updateData((value) => {
       return {
@@ -379,6 +377,7 @@ const BusinessProfileForm = ({
                   <LoadingBtn
                     variant={"outline"}
                     onClick={() => {
+                      const formValues = form.getValues();
                       updateData((value) => ({ ...value, ...formValues }));
                       gotoPrevious();
                     }}
@@ -447,7 +446,7 @@ const OnboardingForm = () => {
 
   return (
     <div className="space-y-8 max-w-sm sm:max-w-lg">
-      <Stepper amount={3} currentStep={index} />
+      <Stepper amount={2} currentStep={index} />
       {index === 1 && (
         <DefaultOrgForm
           data={{ name: data.name, type: data.type }}
