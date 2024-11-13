@@ -215,6 +215,7 @@ const BusinessProfileForm = ({
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
+                          <FormMessage />
                         </div>
                       </FormItem>
                     )}
@@ -285,7 +286,7 @@ const BusinessProfileForm = ({
                             {/* <Input {...field} /> */}
                             <Select
                               onValueChange={(value) => {
-                                form.setValue(field.name, value as any);
+                                form.setValue(field.name, value);
                               }}
                               {...field}
                             >

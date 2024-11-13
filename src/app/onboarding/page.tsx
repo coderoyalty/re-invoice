@@ -1,4 +1,3 @@
-import { assertAuth } from "@/lib";
 import OnboardingForm from "./form";
 
 export default async function () {
