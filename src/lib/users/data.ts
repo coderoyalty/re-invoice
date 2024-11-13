@@ -1,6 +1,8 @@
 import { hashPassword } from "@/utils/password";
 import prisma from "../prisma";
 import { PublicError } from "@/use-cases/errors";
+import { z } from "zod";
+import { onboardingSchema } from "@/app/_lib/definitions";
 
 type AccountProps = {
   displayName: string;
@@ -33,14 +35,13 @@ export async function createAccount(data: AccountProps) {
 
 type CreateOrgProps = {
   userId: string;
-  name: string;
-  type: string;
-};
+} & z.infer<typeof onboardingSchema>;
 
 export async function createOrganisation({
   userId,
   name,
   type,
+  ...data
 }: CreateOrgProps) {
   const user = await prisma.user.findUnique({
     where: {
@@ -67,6 +68,21 @@ export async function createOrganisation({
       name,
       creatorId: user.id,
       businessType: type as any,
+
+      // create the business profile
+      businessProfile: {
+        create: {
+          ...data,
+          organisationName: name,
+        },
+      },
+
+      // transactionally add user as member of the organisation
+      members: {
+        create: {
+          userId: user.id,
+        },
+      },
     },
   });
 
@@ -84,14 +100,6 @@ export async function createOrganisation({
       },
     });
   }
-
-  // add the organisation owner as the first member of an organisation
-  await prisma.organisationMember.create({
-    data: {
-      userId: user.id,
-      orgId: newOrg.id,
-    },
-  });
 
   return {
     org: newOrg,

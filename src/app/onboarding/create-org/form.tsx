@@ -25,50 +25,49 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { defaultOrgAction } from "./actions";
+import { buttonVariants } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Stepper } from "@/components/stepper";
+import { ArrowRight, CheckCircle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  COUNTRIES_LIST,
+  onboardingSchema,
+  OnboardingSchemaType,
+} from "@/app/_lib/definitions";
 
-const formSchema = z.object({
-  name: z.string().min(2).max(40),
-  type: z.enum(["individual", "organisation"]),
+const createOrgSchema = onboardingSchema.pick({
+  name: true,
+  type: true,
 });
 
-type AwaitedReturnTypeNonNullable<
-  T extends (...args: any) => any,
-  F extends keyof Awaited<ReturnType<T>>
-> = Awaited<ReturnType<T>>[F] & {};
+const businessProfileSchema = onboardingSchema.omit({
+  name: true,
+  type: true,
+});
 
-type FormFieldType = z.infer<typeof formSchema>;
-
-export default function CreateOrgForm() {
-  const form = useForm<FormFieldType>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: `my organisation`,
-      type: "individual",
-    },
+const DefaultOrgForm = ({
+  data,
+  updateData,
+  gotoNextForm,
+}: {
+  data: z.infer<typeof createOrgSchema>;
+  updateData: React.Dispatch<React.SetStateAction<OnboardingSchemaType>>;
+  gotoNextForm: () => void;
+}) => {
+  const form = useForm<typeof data>({
+    resolver: zodResolver(createOrgSchema),
+    defaultValues: data,
   });
 
-  const { execute, isPending } = useServerAction(defaultOrgAction, {
-    onSuccess() {
-      toast({
-        title: "Hurray, we did it 🙌",
-        description: "Congrats, You've created your first organisation",
-      });
-    },
-    onError({ err }) {
-      toast({
-        title: "We encountered an error",
-        description: err.message,
-      });
-    },
-  });
-
-  const onSubmit: SubmitHandler<FormFieldType> = (data) => {
-    execute(data);
+  const onSubmit: SubmitHandler<typeof data> = (data) => {
+    updateData((value) => ({ ...value, ...data }));
+    gotoNextForm();
   };
 
   return (
@@ -137,12 +136,8 @@ export default function CreateOrgForm() {
                   )}
                 />
 
-                <LoadingBtn
-                  loading={isPending}
-                  type="submit"
-                  className="w-full"
-                >
-                  Submit
+                <LoadingBtn type="submit" className="w-full">
+                  Next
                 </LoadingBtn>
               </div>
             </CardContent>
@@ -151,4 +146,364 @@ export default function CreateOrgForm() {
       </Form>
     </>
   );
-}
+};
+
+const BusinessProfileForm = ({
+  data,
+  updateData,
+  gotoPrevious,
+  gotoNext,
+}: {
+  data: z.infer<typeof businessProfileSchema>;
+  updateData: React.Dispatch<React.SetStateAction<OnboardingSchemaType>>;
+  gotoPrevious: () => void;
+  gotoNext: () => void;
+}) => {
+  const form = useForm<typeof data>({
+    resolver: zodResolver(businessProfileSchema),
+    defaultValues: data,
+  });
+
+  const formValues = form.watch();
+
+  const handleSubmit: SubmitHandler<typeof data> = (data) => {
+    updateData((value) => {
+      return {
+        ...value,
+        ...data,
+      };
+    });
+
+    gotoNext();
+  };
+
+  return (
+    <>
+      <Form {...form}>
+        <Card className="max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-3xl sm:text-2xl">
+              Business Profile
+            </CardTitle>
+            <CardDescription>Enter your business details below</CardDescription>
+          </CardHeader>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <CardContent>
+              <div className="grid gap-4">
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid gap-2">
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid gap-2">
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="emailAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g jane@business.com"
+                            {...field}
+                            type="email"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="addressLine1"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <FormLabel>Address Line 1</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="addressLine2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <FormLabel>Address Line 2 (optional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid gap-2">
+                          <FormLabel>Country</FormLabel>
+                          <FormControl>
+                            {/* <Input {...field} /> */}
+                            <Select
+                              onValueChange={(value) => {
+                                form.setValue(field.name, value as any);
+                              }}
+                              {...field}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select your country" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {COUNTRIES_LIST.map((country, idx) => {
+                                  return (
+                                    <SelectItem key={idx} value={country.name}>
+                                      {country.name}
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid gap-2">
+                          <FormLabel>State</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid gap-2">
+                          <FormLabel>City</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid gap-2">
+                          <FormLabel>Postal Code</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="websiteUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <FormLabel>Website URL (optional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <LoadingBtn
+                    variant={"outline"}
+                    onClick={() => {
+                      updateData((value) => ({ ...value, ...formValues }));
+                      gotoPrevious();
+                    }}
+                  >
+                    Previous
+                  </LoadingBtn>
+                  <LoadingBtn type="submit">Submit</LoadingBtn>
+                </div>
+              </div>
+            </CardContent>
+          </form>
+        </Card>
+      </Form>
+    </>
+  );
+};
+
+const OnboardingForm = () => {
+  const [data, setData] = useState<OnboardingSchemaType>({
+    name: "my organisation",
+    type: "individual",
+
+    emailAddress: "",
+    firstName: "",
+    lastName: "",
+
+    city: "",
+    country: "",
+    postalCode: "",
+    state: "",
+
+    addressLine1: "",
+    addressLine2: "",
+    websiteUrl: undefined,
+  });
+
+  const [index, setIndex] = useState(1);
+
+  const { execute, isPending, error } = useServerAction(defaultOrgAction, {
+    onSuccess() {
+      toast({
+        title: "Hurray, we did it 🙌",
+        description: "Congrats, You've created your first organisation",
+      });
+    },
+    onError({ err }) {
+      toast({
+        title: "We encountered an error",
+        description: err.message,
+      });
+    },
+  });
+
+  // Trigger the submit
+  React.useEffect(() => {
+    if (index === 3) {
+      execute(data);
+    }
+  }, [index]);
+
+  React.useEffect(() => {
+    if (error) {
+      setIndex(1);
+    }
+  }, [error]);
+
+  return (
+    <div className="space-y-8 max-w-sm sm:max-w-lg">
+      <Stepper amount={3} currentStep={index} />
+      {index === 1 && (
+        <DefaultOrgForm
+          data={{ name: data.name, type: data.type }}
+          updateData={setData}
+          gotoNextForm={() => setIndex(2)}
+        />
+      )}
+      {index === 2 && (
+        <ScrollArea className="h-96 sm:px-6 py-4">
+          <BusinessProfileForm
+            data={{ ...data }}
+            updateData={setData}
+            gotoPrevious={() => setIndex(1)}
+            gotoNext={() => setIndex(3)}
+          />
+        </ScrollArea>
+      )}
+
+      {index === 3 && (
+        <div className="flex flex-col items-center justify-center bg-background text-foreground p-4">
+          <div className="w-full max-w-md space-y-8 text-center">
+            <CheckCircle className="w-16 h-16 mx-auto text-primary" />
+            <h1 className="text-4xl font-bold tracking-tight">
+              Setup Complete!
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Your account has been successfully set up and is ready to use.
+            </p>
+
+            <div className="pt-8">
+              <div
+                className={cn(
+                  "w-full cursor-default",
+                  buttonVariants({
+                    size: "lg",
+                    variant: "outline",
+                  })
+                )}
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Preparing Dashboard
+                  </>
+                ) : (
+                  <>
+                    <ArrowRight className="w-4 h-4 mr-2" />
+                    Go To Dashboard
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default OnboardingForm;
