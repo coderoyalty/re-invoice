@@ -10,7 +10,7 @@ datasource db {
 
 // TODO: consider using an external provider like: Clerk, KindeAuth, Next.js
 model User {
-  id               String    @id @default(uuid())
+  id               String    @id @default(cuid())
   displayName      String
   email            String    @unique
   emailConfirmedAt DateTime?
@@ -47,7 +47,7 @@ model Session {
 }
 
 model Organisation {
-  id   String @id @default(uuid())
+  id   String @id @default(cuid())
   name String
 
   businessType    BusinessType     @default(individual)
@@ -69,7 +69,7 @@ model Organisation {
 }
 
 model OrganisationMember {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   userId String
   orgId  String
@@ -89,7 +89,7 @@ enum BusinessType {
 }
 
 model BusinessProfile {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,7 +119,7 @@ enum InvoiceStatus {
 
 //NOTE: dummy invoice model 
 model Invoice {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
