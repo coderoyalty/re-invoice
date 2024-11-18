@@ -15,6 +15,7 @@ model User {
   email            String    @unique
   emailConfirmedAt DateTime?
   phone            String?
+  avatarUrl        String?
   password         String
 
   createdAt DateTime  @default(now())
@@ -28,8 +29,25 @@ model User {
   createdOrgs Organisation[]       @relation("OrgCreator")
   memberships OrganisationMember[] @relation("UserMemberships")
   invoices    Invoice[]
+  accounts    Account[]
 
   @@index([defaultOrganisationId])
+}
+
+enum Provider {
+  email
+  github
+  google
+}
+
+model Account {
+  id       String   @id @default(cuid())
+  userId   String
+  provider Provider
+
+  githubId Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {
@@ -77,8 +95,8 @@ model OrganisationMember {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user         User         @relation("UserMemberships", fields: [userId], references: [id])
-  organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id])
+  user         User         @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
+  organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([userId, orgId])
 }
@@ -108,7 +126,7 @@ model BusinessProfile {
   country      String
 
   orgId        String       @unique
-  organisation Organisation @relation(references: [id], fields: [orgId])
+  organisation Organisation @relation(references: [id], fields: [orgId], onDelete: Cascade)
 }
 
 enum InvoiceStatus {
@@ -132,5 +150,5 @@ model Invoice {
   creator   User   @relation(references: [id], fields: [creatorId])
 
   orgId        String
-  organisation Organisation @relation(references: [id], fields: [orgId])
+  organisation Organisation @relation(references: [id], fields: [orgId], onDelete: Cascade)
 }
