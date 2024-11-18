@@ -140,11 +140,12 @@ export default function LoginForm() {
                     type="button"
                     variant="outline"
                     className="w-full"
-                    disabled
-                    onClick={() => {}}
+                    asChild
                   >
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
-                    Github
+                    <Link href={"/api/login/github"}>
+                      <GitHubLogoIcon className="mr-2 w-5 h-5" />
+                      Github
+                    </Link>
                   </Button>
                 </div>
               </div>
