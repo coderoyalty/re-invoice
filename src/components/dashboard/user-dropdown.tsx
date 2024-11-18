@@ -29,7 +29,7 @@ const UserDropDown: React.FC<UserDropDownProps> = ({ user }) => {
         <Button variant="secondary" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
             <AvatarImage
-              src="/placeholder-user.jpg"
+              src={user.avatarUrl ?? ""}
               alt={`${user.displayName}`}
             />
             <AvatarFallback>{slugifyInitials(user.displayName)}</AvatarFallback>
