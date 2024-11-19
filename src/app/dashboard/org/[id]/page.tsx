@@ -13,8 +13,17 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AwaitedReturnType } from "@/lib/types";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { BusinessProfileForm } from "./form";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default async function ({
   params,
@@ -38,7 +47,10 @@ export default async function ({
         <div className="space-y-6 p-2 sm:p-4">
           <OrganisationInfoCard organisation={organisation} />
 
-          <BusinessProfileCard businessProfile={organisation.businessProfile} />
+          <BusinessProfileCard
+            orgId={organisation.id}
+            businessProfile={organisation.businessProfile}
+          />
         </div>
       </div>
     </>
@@ -53,6 +65,7 @@ type BusinessProfileCardProps = {
   businessProfile: NonNullable<
     AwaitedReturnType<typeof getOrganisation>
   >["businessProfile"];
+  orgId: string;
 };
 
 function OrganisationInfoCard({ organisation }: OrganisationInfoCardProps) {
@@ -112,14 +125,34 @@ function OrganisationInfoCard({ organisation }: OrganisationInfoCardProps) {
   );
 }
 
-function BusinessProfileCard({ businessProfile }: BusinessProfileCardProps) {
+function BusinessProfileCard({
+  businessProfile,
+  orgId,
+}: BusinessProfileCardProps) {
   if (!businessProfile) {
     return (
-      <div className="mx-auto flex flex-col gap-2 h-[300px] max-w-2xl items-center justify-center rounded-md border border-dashed text-sm">
+      <div className="mx-auto flex flex-col gap-2 h-[300px] max-w-2xl items-center justify-center rounded-md border-2 border-dashed text-sm">
         <p className="text-base font-bold uppercase">
           Haven't created business profile yet.
         </p>
-        <Button>Create Business Profile</Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>Create Business Profile</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-3xl sm:text-2xl">
+                Business Profile
+              </DialogTitle>
+              <DialogDescription>
+                Enter your business details below
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="h-96 px-3 sm:px-6 py-4 flex w-full">
+              <BusinessProfileForm orgId={orgId} />
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

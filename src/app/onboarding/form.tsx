@@ -43,7 +43,7 @@ const createOrgSchema = onboardingSchema.pick({
   type: true,
 });
 
-const businessProfileSchema = onboardingSchema.omit({
+export const businessProfileSchema = onboardingSchema.omit({
   name: true,
   type: true,
 });

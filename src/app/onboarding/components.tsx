@@ -112,7 +112,7 @@ function CountryList({
                   setOpen(false);
                 }}
               >
-                {country.name} {country.currency}
+                {country.name}
               </CommandItem>
             ))}
           </CommandGroup>
