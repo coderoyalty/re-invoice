@@ -27,11 +27,19 @@ export default async function Dashboard() {
           </div>
         </div>
         <section className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
-          <SummaryCards defaultOrg={user.defaultOrganisation?.id ?? ""} />
+          <SummaryCards
+            defaultOrg={
+              user.activeOrganisation?.id ?? user.defaultOrganisation?.id ?? ""
+            }
+          />
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <RecentInvoiceTable
               className="md:col-span-4"
-              defaultOrg={user.defaultOrganisation?.id ?? ""}
+              defaultOrg={
+                user.activeOrganisation?.id ??
+                user.defaultOrganisation?.id ??
+                ""
+              }
             />
             <QuickAction className="md:col-span-4 lg:col-span-3 self-start lg:top-20 lg:sticky" />
           </div>

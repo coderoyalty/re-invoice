@@ -1,9 +1,8 @@
 "use client";
+import React from "react";
 import { DollarSign, User, Building, Users, Table2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { fetchInvoiceSummary } from "@/lib/dashboard/data";
-import React from "react";
-import { useSearchParams } from "next/navigation";
 import SummaryCardsSkeleton from "../ui/skeletons/summary-cards";
 import { AwaitedReturnType } from "@/lib/types";
 
@@ -129,14 +128,11 @@ export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
     pending: true,
   });
 
-  const param = useSearchParams();
-  const currentOrg = param.get("currentOrg");
-
   React.useEffect(() => {
     const fetchData = async () => {
       setState({ pending: true, error: false });
       try {
-        const org = currentOrg ?? defaultOrg;
+        const org = defaultOrg;
 
         const url = `/api/organisations/${org}/summary`;
         const res = await fetch(url, { method: "GET" });
@@ -155,7 +151,7 @@ export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
     };
 
     fetchData();
-  }, [currentOrg]);
+  }, []);
 
   if (state.pending) {
     return <SummaryCardsSkeleton />;

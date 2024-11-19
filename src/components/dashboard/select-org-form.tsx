@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -9,6 +8,8 @@ import {
 } from "../ui/select";
 import { fetchUserOrgs } from "@/lib/dashboard/data";
 import React from "react";
+import { useServerAction } from "zsa-react";
+import { setActiveOrganisation } from "@/actions/dashboard";
 
 interface SelectOrgFormProps {
   organisations: Awaited<ReturnType<typeof fetchUserOrgs>>["organisations"];
@@ -18,11 +19,13 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
   organisations,
   defaultOrg,
 }) => {
-  const router = useRouter();
   const [value, setValue] = React.useState(defaultOrg.id);
-  const handleOnValueChange = (value: string) => {
+
+  const { execute, isPending } = useServerAction(setActiveOrganisation);
+
+  const handleOnValueChange = async (value: string) => {
     setValue(value);
-    router.push(`?currentOrg=${value}`);
+    await execute({ orgId: value });
   };
 
   return (
@@ -33,6 +36,7 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
           defaultValue={defaultOrg.id}
           value={value}
           onValueChange={handleOnValueChange}
+          disabled={isPending}
         >
           <SelectTrigger className="w-[176px]">
             <SelectValue placeholder="Select organization" />

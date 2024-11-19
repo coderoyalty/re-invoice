@@ -25,6 +25,9 @@ model User {
   defaultOrganisationId String?
   defaultOrganisation   Organisation? @relation("DefaultOrg", references: [id], fields: [defaultOrganisationId])
 
+  activeOrganisationId String?
+  activeOrganisation   Organisation? @relation("ActiveOrg", references: [id], fields: [activeOrganisationId])
+
   sessions    Session[]
   createdOrgs Organisation[]       @relation("OrgCreator")
   memberships OrganisationMember[] @relation("UserMemberships")
@@ -81,7 +84,8 @@ model Organisation {
 
   members OrganisationMember[] @relation("OrganisationMembers")
 
-  invoices Invoice[]
+  invoices                Invoice[]
+  activeOrganisationsUser User[]    @relation("ActiveOrg")
 
   @@index([creatorId])
 }

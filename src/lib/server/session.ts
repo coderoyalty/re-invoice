@@ -53,6 +53,7 @@ export async function validateSessionToken(token: string) {
           emailConfirmedAt: true,
           password: false,
           defaultOrganisation: true,
+          activeOrganisation: true,
           avatarUrl: true,
         },
       },

@@ -18,7 +18,6 @@ import { Cross, Ellipsis, Check } from "lucide-react";
 import React from "react";
 import { fetchRecentInvoices } from "@/lib/dashboard/data";
 import { AwaitedReturnType } from "@/lib/types";
-import { useSearchParams } from "next/navigation";
 import RecentInvoiceSkeleton from "../ui/skeletons/recent-invoice";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
@@ -78,14 +77,11 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     pending: true,
   });
 
-  const searchParams = useSearchParams();
-  const currentOrg = searchParams.get("currentOrg");
-
   React.useEffect(() => {
     const fetchData = async () => {
       setState({ pending: true, error: false });
 
-      const org = currentOrg ?? defaultOrg;
+      const org = defaultOrg;
 
       const url = `/api/organisations/${org}/invoices/recent`;
 
@@ -107,7 +103,7 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     };
 
     fetchData();
-  }, [currentOrg]);
+  }, []);
 
   if (state.pending) {
     return <RecentInvoiceSkeleton {...props} />;

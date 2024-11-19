@@ -30,7 +30,7 @@ export async function fetchUserOrgs() {
 
   return {
     organisations,
-    defaultOrg: user.defaultOrganisation,
+    currentOrg: user.activeOrganisation ?? user.defaultOrganisation,
   };
 }
 

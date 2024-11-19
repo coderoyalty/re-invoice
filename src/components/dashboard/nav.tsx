@@ -7,15 +7,15 @@ import { redirect } from "next/navigation";
 const fetchOrgs = React.cache(fetchUserOrgs);
 
 const DashboardNav: React.FC<{}> = async () => {
-  const { organisations, defaultOrg } = await fetchOrgs();
+  const { organisations, currentOrg } = await fetchOrgs();
 
-  if (!defaultOrg) {
+  if (!currentOrg) {
     return redirect("/onboarding");
   }
 
   return (
     <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-      <SelectOrgForm organisations={organisations} defaultOrg={defaultOrg} />
+      <SelectOrgForm organisations={organisations} defaultOrg={currentOrg} />
     </nav>
   );
 };
