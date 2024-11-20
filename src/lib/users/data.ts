@@ -3,6 +3,12 @@ import prisma from "../prisma";
 import { PublicError } from "@/use-cases/errors";
 import { z } from "zod";
 import { onboardingSchema } from "@/app/_lib/definitions";
+import {
+  ALL_PERMISSIONS,
+  SYSTEM_ROLES,
+  USER_ROLE_PERMISSIONS,
+} from "../permissions";
+import { permission } from "process";
 
 type AccountProps = {
   displayName: string;
@@ -77,12 +83,57 @@ export async function createOrganisation({
         },
       },
 
-      // transactionally add user as member of the organisation
-      members: {
-        create: {
-          userId: user.id,
+      permissions: {
+        createMany: {
+          data: ALL_PERMISSIONS.map((value) => {
+            return {
+              key: value,
+              name: value.split(":")[1].toUpperCase().replace("_", " "),
+            };
+          }),
         },
       },
+    },
+
+    include: {
+      permissions: true,
+    },
+  });
+
+  const adminRole = await prisma.role.create({
+    data: {
+      key: SYSTEM_ROLES.ADMIN,
+      name: "Admin",
+      orgId: newOrg.id,
+      permissions: {
+        connect: newOrg.permissions.map((permission) => ({
+          id: permission.id,
+        })),
+      },
+    },
+  });
+
+  await prisma.role.create({
+    data: {
+      key: SYSTEM_ROLES.MEMBER,
+      name: "Member",
+      orgId: newOrg.id,
+      permissions: {
+        connect: newOrg.permissions
+          .filter(({ key }) => USER_ROLE_PERMISSIONS.includes(key as any))
+          .map((permission) => ({
+            id: permission.id,
+          })),
+      },
+    },
+  });
+
+  // first organisation member
+  await prisma.organisationMember.create({
+    data: {
+      orgId: newOrg.id,
+      userId: user.id,
+      roleId: adminRole.id,
     },
   });
 

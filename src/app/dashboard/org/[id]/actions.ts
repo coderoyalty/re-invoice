@@ -10,7 +10,7 @@ export async function getOrganisation(id: string) {
   const { user } = await auth();
 
   if (!user) {
-    return null;
+    return { organisation: null, membership: null };
   }
 
   const organisation = await prisma.organisation.findFirst({
@@ -25,11 +25,23 @@ export async function getOrganisation(id: string) {
     include: {
       businessProfile: true,
       creator: true,
-      members: true,
+      members: {
+        include: {
+          role: true,
+          user: true,
+        },
+      },
     },
   });
 
-  return organisation;
+  return {
+    organisation,
+    membership: organisation
+      ? organisation.members
+          .filter((member) => member.userId === user.id)!
+          .at(0)
+      : null,
+  };
 }
 
 export const createBusinessProfileAction = authenticatedAction
@@ -45,8 +57,6 @@ export const createBusinessProfileAction = authenticatedAction
         members: {
           some: {
             userId: ctx.user.id,
-            //TODO: role: ""
-            //TODO: has the permission to create/update business profile
           },
         },
       },

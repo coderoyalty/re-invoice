@@ -85,7 +85,9 @@ model Organisation {
   members OrganisationMember[] @relation("OrganisationMembers")
 
   invoices                Invoice[]
-  activeOrganisationsUser User[]    @relation("ActiveOrg")
+  activeOrganisationsUser User[]       @relation("ActiveOrg")
+  roles                   Role[]
+  permissions             Permission[]
 
   @@index([creatorId])
 }
@@ -99,10 +101,43 @@ model OrganisationMember {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  roleId String
+  role   Role   @relation("MembershipRole", fields: [roleId], references: [id], onDelete: Cascade)
+
   user         User         @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
   organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, orgId])
   @@index([userId, orgId])
+}
+
+model Role {
+  id          String  @id @default(cuid())
+  name        String
+  key         String
+  description String?
+
+  orgId        String
+  organisation Organisation @relation(fields: [orgId], references: [id])
+  permissions  Permission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignedMembers OrganisationMember[] @relation("MembershipRole")
+
+  @@index([key])
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  name        String
+  key         String
+  description String?
+
+  roles        Role[]
+  organisation Organisation @relation(fields: [orgId], references: [id])
+  orgId        String
 }
 
 enum BusinessType {
