@@ -132,7 +132,7 @@ export default function SummaryCards({ orgId }: { orgId: string }) {
     const fetchData = async () => {
       setState({ pending: true, error: false });
       try {
-        const url = `/api/organisations/${orgId}/summary`;
+        const url = `/api/organisations/summary`;
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
