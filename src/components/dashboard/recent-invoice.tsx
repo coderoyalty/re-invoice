@@ -59,14 +59,12 @@ const statusToBadge = (
 
 interface RecentInvoiceTableProps
   extends React.ComponentPropsWithRef<typeof Card> {
-  defaultOrg: string;
+  orgId: string;
 }
 
 const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
-  defaultOrg,
+  orgId,
   ...props
-}: {
-  defaultOrg: string;
 }) => {
   const [invoices, setInvoices] = React.useState<
     AwaitedReturnType<typeof fetchRecentInvoices>
@@ -81,9 +79,7 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     const fetchData = async () => {
       setState({ pending: true, error: false });
 
-      const org = defaultOrg;
-
-      const url = `/api/organisations/${org}/invoices/recent`;
+      const url = `/api/organisations/${orgId}/invoices/recent`;
 
       try {
         const req = await fetch(url, { method: "GET" });

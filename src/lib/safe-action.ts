@@ -1,6 +1,6 @@
 import { PublicError } from "@/use-cases/errors";
 import { createServerActionProcedure } from "zsa";
-import { assertAuth } from ".";
+import { assertAuth } from "./auth";
 
 function shapeErrors({ err }: any) {
   const isAllowedError = err instanceof PublicError;

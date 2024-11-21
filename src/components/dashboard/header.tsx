@@ -3,13 +3,17 @@ import Logo from "../Logo";
 import DashboardNav from "./nav";
 import ThemeSwitch from "../ThemeSwitch";
 import { Separator } from "../ui/separator";
-import UserDropDown, { UserDropDownProps } from "./user-dropdown";
+import UserDropDown from "./user-dropdown";
+import { getUser } from "@/lib/users/data";
+import { notFound } from "next/navigation";
 
-export default function DashboardHeader({
-  user,
-}: {
-  user: UserDropDownProps["user"];
-}) {
+export default async function DashboardHeader({ userId }: { userId: string }) {
+  const user = await getUser(userId);
+
+  if (!user) {
+    notFound();
+  }
+
   return (
     <>
       <header className="top-0 sticky bg-transparent gap-2 bg-opacity-30 backdrop-blur-md border-b border-white border-opacity-20 shadow-md z-50">

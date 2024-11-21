@@ -118,7 +118,7 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
-export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
+export default function SummaryCards({ orgId }: { orgId: string }) {
   const [data, setData] = React.useState<
     AwaitedReturnType<typeof fetchInvoiceSummary>
   >({} as any);
@@ -132,9 +132,7 @@ export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
     const fetchData = async () => {
       setState({ pending: true, error: false });
       try {
-        const org = defaultOrg;
-
-        const url = `/api/organisations/${org}/summary`;
+        const url = `/api/organisations/${orgId}/summary`;
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {

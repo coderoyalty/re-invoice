@@ -8,7 +8,6 @@ import {
   SYSTEM_ROLES,
   USER_ROLE_PERMISSIONS,
 } from "../permissions";
-import { permission } from "process";
 
 type AccountProps = {
   displayName: string;
@@ -155,4 +154,18 @@ export async function createOrganisation({
   return {
     org: newOrg,
   };
+}
+
+export async function getUser(id: string) {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      avatarUrl: true,
+      displayName: true,
+      email: true,
+      id: true,
+    },
+  });
 }

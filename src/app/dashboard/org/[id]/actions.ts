@@ -1,15 +1,15 @@
 "use server";
 import { extendedBusinessProfileSchema } from "@/app/_lib/definitions";
-import { auth } from "@/lib";
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { authenticatedAction } from "@/lib/safe-action";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 
 export async function getOrganisation(id: string) {
-  const { user } = await auth();
+  const { userId } = await auth();
 
-  if (!user) {
+  if (!userId) {
     return { organisation: null, membership: null };
   }
 
@@ -18,7 +18,7 @@ export async function getOrganisation(id: string) {
       id: id,
       members: {
         some: {
-          userId: user.id,
+          userId,
         },
       },
     },
@@ -37,9 +37,7 @@ export async function getOrganisation(id: string) {
   return {
     organisation,
     membership: organisation
-      ? organisation.members
-          .filter((member) => member.userId === user.id)!
-          .at(0)
+      ? organisation.members.find((member) => member.userId === userId)!
       : null,
   };
 }

@@ -1,15 +1,15 @@
 import React from "react";
 
 import SummaryCards from "@/components/dashboard/summary-cards";
-import { auth } from "@/lib";
 import { redirect } from "next/navigation";
 import QuickAction from "@/components/dashboard/quick-action";
 import RecentInvoiceTable from "../../components/dashboard/recent-invoice";
+import { auth } from "@/lib/auth";
 
 export default async function Dashboard() {
-  const { user } = await auth();
+  const { userId, orgId } = await auth();
 
-  if (!user) {
+  if (!userId) {
     return redirect("/login");
   }
 
@@ -27,20 +27,9 @@ export default async function Dashboard() {
           </div>
         </div>
         <section className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
-          <SummaryCards
-            defaultOrg={
-              user.activeOrganisation?.id ?? user.defaultOrganisation?.id ?? ""
-            }
-          />
+          <SummaryCards orgId={orgId ?? ""} />
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <RecentInvoiceTable
-              className="md:col-span-4"
-              defaultOrg={
-                user.activeOrganisation?.id ??
-                user.defaultOrganisation?.id ??
-                ""
-              }
-            />
+            <RecentInvoiceTable className="md:col-span-4" orgId={orgId ?? ""} />
             <QuickAction className="md:col-span-4 lg:col-span-3 self-start lg:top-20 lg:sticky" />
           </div>
         </section>
