@@ -68,9 +68,14 @@ export async function GET(request: Request): Promise<Response> {
         await githubUserEmailResponse.json();
 
       const githubEmail = githubUserEmails.find(
-        (userEmail) => userEmail.primary
+        (userEmail) => userEmail.primary && userEmail.verified
       );
-      githubUser.email = githubEmail!.email;
+
+      if (githubEmail) {
+        githubUser.email = githubEmail.email;
+      } else {
+        return new Response("No verified email found", { status: 400 });
+      }
     }
 
     const userId = await createGithubUser(githubUser);

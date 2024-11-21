@@ -51,6 +51,8 @@ model Account {
   githubId Int?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider]) // prevent multiple accounts of the same provider type
 }
 
 model Session {
