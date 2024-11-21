@@ -85,9 +85,10 @@ export async function createOrganisation({
       permissions: {
         createMany: {
           data: ALL_PERMISSIONS.map((value) => {
+            const namePart = value.includes(":") ? value.split(":")[1] : value;
             return {
               key: value,
-              name: value.split(":")[1].toUpperCase().replace("_", " "),
+              name: namePart.toUpperCase().replace("_", " "),
             };
           }),
         },

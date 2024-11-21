@@ -27,9 +27,20 @@ export default async function Dashboard() {
           </div>
         </div>
         <section className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
-          <SummaryCards orgId={orgId ?? ""} />
+          <SummaryCards />
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <RecentInvoiceTable className="md:col-span-4" orgId={orgId ?? ""} />
+            {orgId ? (
+              <>
+                <RecentInvoiceTable className="md:col-span-4" orgId={orgId} />
+              </>
+            ) : (
+              <>
+                <p className="text-xl text-center">
+                  No organization selected. Please select an organization to
+                  view the dashboard.
+                </p>
+              </>
+            )}
             <QuickAction className="md:col-span-4 lg:col-span-3 self-start lg:top-20 lg:sticky" />
           </div>
         </section>

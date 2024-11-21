@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { fetchInvoiceSummary } from "@/lib/dashboard/data";
 import SummaryCardsSkeleton from "../ui/skeletons/summary-cards";
 import { AwaitedReturnType } from "@/lib/types";
+import { InvoiceSummaryResponse } from "@/app/api/organisations/summary/route";
 
 function formatWithSign(value: number) {
   return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
@@ -118,7 +119,7 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
-export default function SummaryCards({ orgId }: { orgId: string }) {
+export default function SummaryCards() {
   const [data, setData] = React.useState<
     AwaitedReturnType<typeof fetchInvoiceSummary>
   >({} as any);
@@ -139,8 +140,8 @@ export default function SummaryCards({ orgId }: { orgId: string }) {
           throw new Error();
         }
 
-        const result = await res.json();
-        setData(result);
+        const result: InvoiceSummaryResponse = await res.json();
+        setData(result.data);
       } catch (err) {
         setState((prev) => ({ ...prev, error: true }));
       } finally {

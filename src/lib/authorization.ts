@@ -9,7 +9,7 @@ type CheckOrgAuthorization = (
 ) => boolean | null;
 
 type AuthorizationOptions = {
-  userId: string | null | undefined;
+  userId: string;
   orgId: string | null | undefined;
   orgRole: string | null | undefined;
   orgPermissions: string[] | null | undefined;

@@ -104,12 +104,12 @@ model OrganisationMember {
   updatedAt DateTime @updatedAt
 
   roleId String
-  role   Role   @relation("MembershipRole", fields: [roleId], references: [id], onDelete: Cascade)
+  role   Role   @relation("MembershipRole", fields: [roleId], references: [id])
 
   user         User         @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
   organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, orgId])
+  @@unique([userId, orgId]) // prevent duplicate role keys within the same organisation
   @@index([userId, orgId])
 }
 
@@ -121,13 +121,14 @@ model Role {
 
   orgId        String
   organisation Organisation @relation(fields: [orgId], references: [id])
-  permissions  Permission[]
+  permissions  Permission[] @relation("RolePermissions")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   assignedMembers OrganisationMember[] @relation("MembershipRole")
 
+  @@unique([orgId, key])
   @@index([key])
 }
 
@@ -137,9 +138,11 @@ model Permission {
   key         String
   description String?
 
-  roles        Role[]
+  roles        Role[]       @relation("RolePermissions")
   organisation Organisation @relation(fields: [orgId], references: [id])
   orgId        String
+
+  @@unique([orgId, key])
 }
 
 enum BusinessType {

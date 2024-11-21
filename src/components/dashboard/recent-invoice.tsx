@@ -77,6 +77,9 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
 
   React.useEffect(() => {
     const fetchData = async () => {
+      if (!orgId) {
+        return;
+      }
       setState({ pending: true, error: false });
 
       const url = `/api/organisations/${orgId}/invoices/recent`;
@@ -99,7 +102,7 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     };
 
     fetchData();
-  }, []);
+  }, [orgId]);
 
   if (state.pending) {
     return <RecentInvoiceSkeleton {...props} />;

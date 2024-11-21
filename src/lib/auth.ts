@@ -103,11 +103,12 @@ export async function signedInAuthObject(
       (member) => member.userId === user.id
     );
 
-    orgId = organisation?.id ?? undefined;
-    orgRole = organisation ? orgMember!.role.key : undefined;
-    orgPermissions = organisation
-      ? orgMember?.role.permissions.map((permission) => permission.key)
-      : undefined;
+    orgId = organisation ? organisation.id : undefined;
+    orgRole = organisation && orgMember ? orgMember.role.key : undefined;
+    orgPermissions =
+      organisation && orgMember
+        ? orgMember.role.permissions.map((permission) => permission.key)
+        : undefined;
   }
 
   const authObject: SignedInAuthObject = {

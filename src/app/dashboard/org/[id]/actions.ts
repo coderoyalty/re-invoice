@@ -36,9 +36,8 @@ export async function getOrganisation(id: string) {
 
   return {
     organisation,
-    membership: organisation
-      ? organisation.members.find((member) => member.userId === userId)!
-      : null,
+    membership:
+      organisation?.members.find((member) => member.userId === userId) ?? null,
   };
 }
 

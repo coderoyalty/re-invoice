@@ -10,6 +10,7 @@ import { fetchUserOrgs } from "@/lib/dashboard/data";
 import React from "react";
 import { useServerAction } from "zsa-react";
 import { setActiveOrganisation } from "@/actions/dashboard";
+import { toast } from "@/hooks/use-toast";
 
 interface SelectOrgFormProps {
   organisations: Awaited<ReturnType<typeof fetchUserOrgs>>["organisations"];
@@ -24,8 +25,15 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
   const { execute, isPending } = useServerAction(setActiveOrganisation);
 
   const handleOnValueChange = async (value: string) => {
-    setValue(value);
-    await execute({ orgId: value });
+    try {
+      await execute({ orgId: value });
+      setValue(value);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        description: "'Failed to update organisation",
+      });
+    }
   };
 
   return (
