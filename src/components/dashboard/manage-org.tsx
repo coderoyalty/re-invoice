@@ -18,6 +18,7 @@ import Link from "next/link";
 import { fetchOrgsWithDetails } from "@/lib/dashboard/data";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 const ManageOrgCard = async () => {
   const organizations = await fetchOrgsWithDetails();
@@ -74,8 +75,8 @@ const ManageOrgCard = async () => {
                       {org.members}
                     </TableCell>
 
-                    <TableCell>{org.createdAt.toLocaleString()}</TableCell>
-                    <TableCell>{org.joinedAt.toLocaleString()}</TableCell>
+                    <TableCell>{format(org.createdAt, "yyyy-MM-dd")}</TableCell>
+                    <TableCell>{format(org.joinedAt, "yyyy-MM-dd")}</TableCell>
                     <TableCell className="text-center">
                       <Badge
                         className={cn(

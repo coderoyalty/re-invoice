@@ -35,18 +35,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Stepper } from "@/components/stepper";
 import { ArrowRight, CheckCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  COUNTRIES_LIST,
-  onboardingSchema,
-  OnboardingSchemaType,
-} from "@/app/_lib/definitions";
+import { onboardingSchema, OnboardingSchemaType } from "@/app/_lib/definitions";
+import { CountriesCombobox } from "./components";
 
 const createOrgSchema = onboardingSchema.pick({
   name: true,
   type: true,
 });
 
-const businessProfileSchema = onboardingSchema.omit({
+export const businessProfileSchema = onboardingSchema.omit({
   name: true,
   type: true,
 });
@@ -240,38 +237,6 @@ const BusinessProfileForm = ({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="addressLine1"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="grid gap-2">
-                        <FormLabel>Address Line 1</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="addressLine2"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="grid gap-2">
-                        <FormLabel>Address Line 2 (optional)</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="grid sm:grid-cols-2 gap-2">
                   <FormField
                     control={form.control}
@@ -281,26 +246,14 @@ const BusinessProfileForm = ({
                         <div className="grid gap-2">
                           <FormLabel>Country</FormLabel>
                           <FormControl>
-                            {/* <Input {...field} /> */}
-                            <Select
-                              onValueChange={(value) => {
-                                form.setValue(field.name, value);
+                            <CountriesCombobox
+                              value={field.value}
+                              setValue={(value) => {
+                                form.setValue(field.name, value, {
+                                  shouldValidate: true,
+                                });
                               }}
-                              {...field}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select your country" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {COUNTRIES_LIST.map((country, idx) => {
-                                  return (
-                                    <SelectItem key={idx} value={country.name}>
-                                      {country.name}
-                                    </SelectItem>
-                                  );
-                                })}
-                              </SelectContent>
-                            </Select>
+                            />
                           </FormControl>
                         </div>
                         <FormMessage />
@@ -356,6 +309,38 @@ const BusinessProfileForm = ({
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="addressLine1"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <FormLabel>Address Line 1</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="addressLine2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <FormLabel>Address Line 2 (optional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
