@@ -2,13 +2,13 @@ import Features from "@/components/Features";
 import Hero from "@/components/Hero";
 import Pricing from "@/components/Pricing";
 import Testimonials from "@/components/Testimonials";
-import { auth } from "@/lib";
+import { auth } from "@/lib/auth";
 
 export default async function Home() {
-  const { user } = await auth();
+  const { userId } = await auth();
   return (
     <>
-      <Hero authenticated={user ? true : false} />
+      <Hero authenticated={userId ? true : false} />
       <Features />
       <Pricing />
       <Testimonials />
