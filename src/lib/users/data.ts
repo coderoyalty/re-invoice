@@ -100,32 +100,36 @@ export async function createOrganisation({
     },
   });
 
-  const adminRole = await prisma.role.create({
-    data: {
-      key: SYSTEM_ROLES.ADMIN,
-      name: "Admin",
-      orgId: newOrg.id,
-      permissions: {
-        connect: newOrg.permissions.map((permission) => ({
-          id: permission.id,
-        })),
-      },
-    },
-  });
-
-  await prisma.role.create({
-    data: {
-      key: SYSTEM_ROLES.MEMBER,
-      name: "Member",
-      orgId: newOrg.id,
-      permissions: {
-        connect: newOrg.permissions
-          .filter(({ key }) => USER_ROLE_PERMISSIONS.includes(key as any))
-          .map((permission) => ({
+  const adminRole = await prisma.$transaction(async (tx) => {
+    const adminRole = await tx.role.create({
+      data: {
+        key: SYSTEM_ROLES.ADMIN,
+        name: "Admin",
+        orgId: newOrg.id,
+        permissions: {
+          connect: newOrg.permissions.map((permission) => ({
             id: permission.id,
           })),
+        },
       },
-    },
+    });
+
+    await tx.role.create({
+      data: {
+        key: SYSTEM_ROLES.MEMBER,
+        name: "Member",
+        orgId: newOrg.id,
+        permissions: {
+          connect: newOrg.permissions
+            .filter(({ key }) => USER_ROLE_PERMISSIONS.includes(key as any))
+            .map((permission) => ({
+              id: permission.id,
+            })),
+        },
+      },
+    });
+
+    return adminRole;
   });
 
   // first organisation member
