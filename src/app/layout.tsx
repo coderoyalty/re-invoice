@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
 import { Providers } from "./providers";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import clsx from "clsx";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Invoicely",
@@ -28,7 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-black dark:text-white`}
+        className={clsx(
+          "antialiased dark:bg-black dark:text-white",
+          "flex min-h-[100vh] flex-col bg-slate-100",
+          inter.className
+        )}
       >
         <Providers>
           {children}

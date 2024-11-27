@@ -14,7 +14,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Cross, Ellipsis, Check } from "lucide-react";
+import { Cross, Ellipsis, Check, MoveRight } from "lucide-react";
 import React from "react";
 import { fetchRecentInvoices } from "@/lib/dashboard/data";
 import { AwaitedReturnType } from "@/lib/types";
@@ -22,6 +22,8 @@ import { useSearchParams } from "next/navigation";
 import RecentInvoiceSkeleton from "../ui/skeletons/recent-invoice";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
+import clsx from "clsx";
+import { buttonVariants } from "../ui/button";
 
 const statusToBadge = (
   status: AwaitedReturnType<typeof fetchRecentInvoices>[0]["status"]
@@ -117,7 +119,19 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     <>
       <Card {...props}>
         <CardHeader>
-          <CardTitle>Recent Invoices</CardTitle>
+          <CardTitle className="flex items-center">
+            <span className="flex-1">Recent Invoices</span>
+            <Link
+              href={"/dashboard/invoices"}
+              className={clsx(
+                buttonVariants({
+                  variant: "link",
+                })
+              )}
+            >
+              View All <MoveRight className="ml-2 w-5 h-5" />
+            </Link>
+          </CardTitle>
           <CardDescription>
             You have created {invoices.length} invoices this month.
           </CardDescription>
