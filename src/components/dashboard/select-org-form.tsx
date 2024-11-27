@@ -34,7 +34,7 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
           value={value}
           onValueChange={handleOnValueChange}
         >
-          <SelectTrigger className="w-[176px]">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Select organization" />
           </SelectTrigger>
           <SelectContent>

@@ -14,7 +14,7 @@ const DashboardNav: React.FC<{}> = async () => {
   }
 
   return (
-    <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+    <nav className="w-full flex items-center gap-4 sm:gap-6">
       <SelectOrgForm organisations={organisations} defaultOrg={defaultOrg} />
     </nav>
   );
