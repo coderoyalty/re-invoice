@@ -8,8 +8,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Label } from "@radix-ui/react-label";
-import { formatDate, formatDistance } from "date-fns";
-import { Badge } from "@/components/ui/badge";
+import { badgeVariants } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AwaitedReturnType } from "@/lib/types";
 import { Input } from "@/components/ui/input";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { BusinessProfileForm } from "./form";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useFormatter } from "next-intl";
 
 export default async function ({
   params,
@@ -40,7 +40,7 @@ export default async function ({
 
   return (
     <>
-      <div className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto py-6 px-1 sm:px-4 lg:px-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-6">
           Organisation Details
         </h1>
@@ -77,38 +77,40 @@ function OrganisationInfoCard({
   organisation,
   membership,
 }: OrganisationInfoCardProps) {
+  const format = useFormatter();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Organisation Information</CardTitle>
+        <CardTitle className="text-lg md:text-xl">
+          Organisation Information
+        </CardTitle>
         <CardDescription>Basic details about your organisation</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label>Name</Label>
-            <p className="text-lg">{organisation.name}</p>
+            <p>{organisation.name}</p>
           </div>
           <div>
             <Label>Owner</Label>
-            <p className="text-lg">
+            <p>
               {organisation.creator.displayName} ({organisation.creator.email})
             </p>
           </div>
           <div className="space-y-1">
-            <Label>Business Type</Label>
-            <p className="p-0.5">
-              <Badge
-                className={cn(
-                  "lowercase rounded-sm p-0.5",
-                  organisation.businessType === "individual"
-                    ? "bg-orange-600"
-                    : "bg-fuchsia-500"
-                )}
-              >
-                {organisation.businessType}
-              </Badge>
-            </p>
+            <Label className="block">Business Type</Label>
+            <span
+              className={cn(
+                badgeVariants({ variant: "outline" }),
+                "lowercase py-0.5 text-white",
+                organisation.businessType === "individual"
+                  ? "bg-orange-600"
+                  : "bg-rose-600"
+              )}
+            >
+              {organisation.businessType}
+            </span>
           </div>
           <div className="space-y-1">
             <Label>Role</Label>
@@ -116,20 +118,22 @@ function OrganisationInfoCard({
           </div>
           <div>
             <Label>Created At</Label>
-            <p className="text-lg">
-              {formatDate(organisation.createdAt, "yyyy/MM/dd")}
+            <p>
+              {format.dateTime(organisation.createdAt, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </p>
           </div>
           <div>
             <Label>Last Updated</Label>
-            <p className="text-lg">
-              {formatDistance(new Date(), organisation.updatedAt)}
-            </p>
+            <p>{format.relativeTime(organisation.updatedAt)}</p>
           </div>
 
           <div>
             <Label>Members</Label>
-            <p className="text-lg">{organisation.members.length}</p>
+            <p>{organisation.members.length}</p>
           </div>
         </div>
       </CardContent>

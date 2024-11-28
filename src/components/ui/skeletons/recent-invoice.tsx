@@ -29,9 +29,7 @@ export default function RecentInvoiceSkeleton(
       <Card className={props.className}>
         <CardHeader>
           <CardTitle>Recent Invoices</CardTitle>
-          <CardDescription>
-            <Skeleton className="w-full h-6" />
-          </CardDescription>
+          <Skeleton className="w-full h-6" />
         </CardHeader>
         <CardContent>
           <Table>

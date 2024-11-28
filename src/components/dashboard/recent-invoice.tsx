@@ -14,13 +14,22 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Cross, Ellipsis, Check } from "lucide-react";
+import {
+  Ellipsis,
+  Check,
+  MoveRight,
+  X,
+  LoaderPinwheel,
+  LucideLoader2,
+} from "lucide-react";
 import React from "react";
 import { fetchRecentInvoices } from "@/lib/dashboard/data";
 import { AwaitedReturnType } from "@/lib/types";
 import RecentInvoiceSkeleton from "../ui/skeletons/recent-invoice";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
+import clsx from "clsx";
+import { buttonVariants } from "../ui/button";
 
 const statusToBadge = (
   status: AwaitedReturnType<typeof fetchRecentInvoices>[0]["status"]
@@ -29,29 +38,31 @@ const statusToBadge = (
     case "completed":
       return (
         <Badge className="bg-green-500 hover:bg-green-600 lowercase px-2">
-          Completed
-          <Check className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Completed</span>
+          <Check className="ml-0.5 h-4 w-4 animate-bounce" />
         </Badge>
       );
     case "failed":
       return (
         <Badge className="bg-red-600 hover:bg-red-700 lowercase px-2">
-          Failed
-          <Cross className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Failed</span>
+
+          <X className="ml-0.5 h-4 w-4 animate-pulse" />
         </Badge>
       );
     case "pending":
       return (
         <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-2">
-          Pending
-          <Ellipsis className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Pending</span>
+
+          <LucideLoader2 className="ml-0.5 h-4 w-4 animate-spin" />
         </Badge>
       );
     default:
       return (
         <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-2">
-          Pending
-          <Ellipsis className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Pending</span>
+          <Ellipsis className="ml-0.5 h-4 w-4" />
         </Badge>
       );
   }
@@ -112,7 +123,19 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     <>
       <Card {...props}>
         <CardHeader>
-          <CardTitle>Recent Invoices</CardTitle>
+          <CardTitle className="flex items-center">
+            <span className="flex-1">Recent Invoices</span>
+            <Link
+              href={"/dashboard/invoices"}
+              className={clsx(
+                buttonVariants({
+                  variant: "link",
+                })
+              )}
+            >
+              View All <MoveRight className="ml-2 w-5 h-5" />
+            </Link>
+          </CardTitle>
           <CardDescription>
             You have created {invoices.length} invoices this month.
           </CardDescription>
