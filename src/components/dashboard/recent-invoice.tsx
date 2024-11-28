@@ -14,7 +14,14 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Cross, Ellipsis, Check, MoveRight } from "lucide-react";
+import {
+  Ellipsis,
+  Check,
+  MoveRight,
+  X,
+  LoaderPinwheel,
+  LucideLoader2,
+} from "lucide-react";
 import React from "react";
 import { fetchRecentInvoices } from "@/lib/dashboard/data";
 import { AwaitedReturnType } from "@/lib/types";
@@ -32,29 +39,31 @@ const statusToBadge = (
     case "completed":
       return (
         <Badge className="bg-green-500 hover:bg-green-600 lowercase px-2">
-          Completed
-          <Check className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Completed</span>
+          <Check className="ml-0.5 h-4 w-4 animate-bounce" />
         </Badge>
       );
     case "failed":
       return (
         <Badge className="bg-red-600 hover:bg-red-700 lowercase px-2">
-          Failed
-          <Cross className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Failed</span>
+
+          <X className="ml-0.5 h-4 w-4 animate-pulse" />
         </Badge>
       );
     case "pending":
       return (
         <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-2">
-          Pending
-          <Ellipsis className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Pending</span>
+
+          <LucideLoader2 className="ml-0.5 h-4 w-4 animate-spin" />
         </Badge>
       );
     default:
       return (
         <Badge className="bg-yellow-500 hover:bg-yellow-600 lowercase px-2">
-          Pending
-          <Ellipsis className="ml-1 h-4 w-4" />
+          <span className="max-sm:sr-only">Pending</span>
+          <Ellipsis className="ml-0.5 h-4 w-4" />
         </Badge>
       );
   }

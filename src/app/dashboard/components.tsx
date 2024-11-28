@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { auth } from "@/lib";
@@ -37,22 +38,54 @@ const items = [
   },
 ];
 
-function DashboardSidebarFooter({
-  user,
-}: {
-  user: AwaitedReturnType<typeof auth>["user"] & {};
-}) {
+export function AppLogoHeader() {
   return (
     <>
-      <SidebarFooter>
-        <NavUser
-          user={{
-            avatar: user.avatarUrl || "",
-            email: user.email,
-            name: user.displayName,
-          }}
-        />
-      </SidebarFooter>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild>
+            <Link href={"/"}>
+              <FileText />
+              Invoicely
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </>
+  );
+}
+
+export function NavMain() {
+  const { toggleSidebar, isMobile } = useSidebar();
+  return (
+    <>
+      <SidebarGroup>
+        <SidebarGroupLabel>Application</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {items.map((item) => (
+              <>
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className="p-2"
+                    onClick={() => {
+                      if (isMobile) {
+                        toggleSidebar();
+                      }
+                    }}
+                  >
+                    <Link href={item.url}>
+                      <item.icon />
+                      {item.title}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
     </>
   );
 }
@@ -62,52 +95,25 @@ export function DashboardSidebar({
 }: {
   user: AwaitedReturnType<typeof auth>["user"] & {};
 }) {
-  const { toggleSidebar, isMobile } = useSidebar();
   return (
     <>
       <Sidebar collapsible="icon" variant="floating">
         <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href={"/"}>
-                  <FileText />
-                  Invoicely
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <AppLogoHeader />
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {items.map((item) => (
-                  <>
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        className="p-2"
-                        onClick={() => {
-                          if (isMobile) {
-                            toggleSidebar();
-                          }
-                        }}
-                      >
-                        <Link href={item.url}>
-                          <item.icon />
-                          {item.title}
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <NavMain />
         </SidebarContent>
-        <DashboardSidebarFooter user={user} />
+        <SidebarFooter>
+          <NavUser
+            user={{
+              avatar: user.avatarUrl || "",
+              email: user.email,
+              name: user.displayName,
+            }}
+          />
+        </SidebarFooter>
+        <SidebarRail />
       </Sidebar>
     </>
   );
