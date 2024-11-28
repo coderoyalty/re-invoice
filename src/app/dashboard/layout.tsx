@@ -1,7 +1,11 @@
 import DashboardHeader from "@/components/dashboard/header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import React from "react";
+import { DashboardSidebar } from "./components";
+import { cookies } from "next/headers";
+import { getUser } from "@/lib/users/data";
 
 export default async function DashboardLayout({
   children,
@@ -18,14 +22,24 @@ export default async function DashboardLayout({
     return redirect("/onboarding/");
   }
 
+  const user = await getUser(userId);
+
+  const cookieStore = cookies();
+  const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
+
   return (
     <>
-      <div className="flex flex-col min-h-screen">
-        <DashboardHeader userId={userId} />
-        <main className="flex-1 w-full py-6 px-[2px] md:px-2 lg:px-8">
-          {children}
-        </main>
-      </div>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <DashboardSidebar user={user!} />
+        <SidebarInset>
+          <DashboardHeader />
+          <div className="flex flex-col min-h-screen w-full">
+            <main className="flex-1 py-6 px-[2px] md:px-2 lg:px-8">
+              {children}
+            </main>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     </>
   );
 }
