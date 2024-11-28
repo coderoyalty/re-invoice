@@ -5,6 +5,9 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import clsx from "clsx";
 
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -12,13 +15,16 @@ export const metadata: Metadata = {
   description: "Seamlessly generate invoices for your business or personal use",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={clsx(
           "antialiased dark:bg-black dark:text-white",
@@ -26,10 +32,12 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <Providers>
-          {children}
-          <Toaster />
-        </Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
