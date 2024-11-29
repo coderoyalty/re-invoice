@@ -10,6 +10,7 @@ import {
   SYSTEM_ROLES,
   USER_ROLE_PERMISSIONS,
 } from "@/lib/permissions";
+import { revalidatePath } from "next/cache";
 
 const createOrgSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -93,5 +94,6 @@ export const createOrgAction = authenticatedAction
       );
     }
 
+    revalidatePath(`/dashboard`);
     return redirect(`/dashboard/org/${newOrg.id}`);
   });

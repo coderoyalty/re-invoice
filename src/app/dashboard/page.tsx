@@ -27,7 +27,7 @@ export default async function Dashboard() {
           </div>
         </div>
         <section className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
-          <SummaryCards />
+          <SummaryCards orgId={orgId!} />
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             {orgId ? (
               <>

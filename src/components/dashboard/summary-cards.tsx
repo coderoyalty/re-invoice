@@ -119,7 +119,7 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
-export default function SummaryCards() {
+export default function SummaryCards({ orgId }: { orgId: string }) {
   const [data, setData] = React.useState<
     AwaitedReturnType<typeof fetchInvoiceSummary>
   >({} as any);
@@ -133,7 +133,7 @@ export default function SummaryCards() {
     const fetchData = async () => {
       setState({ pending: true, error: false });
       try {
-        const url = `/api/organisations/summary`;
+        const url = `/api/organisations/summary`; // TODO: should take orgId? (currently fetches the active organisation summary)
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
@@ -150,7 +150,7 @@ export default function SummaryCards() {
     };
 
     fetchData();
-  }, []);
+  }, [orgId]);
 
   if (state.pending) {
     return <SummaryCardsSkeleton />;
