@@ -1,13 +1,5 @@
 "use client";
-import { onboardingSchema } from "@/app/_lib/definitions";
 import LoadingBtn from "@/components/LoadingBtn";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,

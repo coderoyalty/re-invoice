@@ -1,5 +1,14 @@
 "use client";
 import { NavUser } from "@/components/dashboard/nav-user";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogHeader,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Sidebar,
   SidebarContent,
@@ -16,9 +25,16 @@ import {
 } from "@/components/ui/sidebar";
 import { AwaitedReturnType } from "@/lib/types";
 import { getUser } from "@/lib/users/data";
-import { Building2, FileText, LayoutDashboard, Receipt } from "lucide-react";
+import {
+  Building2,
+  FileText,
+  LayoutDashboard,
+  Plus,
+  Receipt,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { CreateOrganisationForm } from "./org/form";
 
 const items = [
   {
@@ -90,6 +106,38 @@ export function NavMain() {
   );
 }
 
+export function NavOrganisationAction() {
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>Actions</SidebarGroupLabel>
+
+      <SidebarGroupContent>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <Dialog>
+              <SidebarMenuButton asChild>
+                <DialogTrigger>
+                  <Plus />
+                  Create Organisation
+                </DialogTrigger>
+              </SidebarMenuButton>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Create Organisation</DialogTitle>
+                  <DialogDescription>
+                    Create a new organisation
+                  </DialogDescription>
+                </DialogHeader>
+                <CreateOrganisationForm />
+              </DialogContent>
+            </Dialog>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}
+
 export function DashboardSidebar({
   user,
 }: {
@@ -103,6 +151,7 @@ export function DashboardSidebar({
         </SidebarHeader>
         <SidebarContent>
           <NavMain />
+          <NavOrganisationAction />
         </SidebarContent>
         <SidebarFooter>
           <NavUser

@@ -33,10 +33,8 @@ export default async function DashboardLayout({
         <DashboardSidebar user={user!} />
         <SidebarInset>
           <DashboardHeader />
-          <div className="flex flex-col min-h-screen w-full">
-            <main className="flex-1 py-6 px-[2px] md:px-2 lg:px-8">
-              {children}
-            </main>
+          <div className="flex flex-col min-h-screen w-full mt-4 md:mt-6 lg:mt-8">
+            {children}
           </div>
         </SidebarInset>
       </SidebarProvider>
