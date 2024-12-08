@@ -79,5 +79,5 @@ export const createBusinessProfileAction = authenticatedAction
       },
     });
 
-    revalidatePath("/dashboard/org/[id]");
+    revalidatePath(`/dashboard/org/${orgId}`);
   });

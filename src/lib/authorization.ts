@@ -2,7 +2,7 @@ import { CheckAuthorizationWithCustomPermissions } from "./auth";
 
 type CheckOrgAuthorization = (
   params: {
-    role?: string;
+    role?: string | string[];
     permission?: string;
   },
   { orgId, orgRole, orgPermissions }: AuthorizationOptions
@@ -28,7 +28,12 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
     return orgPermissions.includes(params.permission);
   }
   if (params.role) {
-    return orgRole === params.role;
+    if (Array.isArray(params.role)) {
+      const rv = params.role.find((role) => orgRole == role);
+      return rv !== undefined;
+    } else {
+      return orgRole === params.role;
+    }
   }
   return null;
 };

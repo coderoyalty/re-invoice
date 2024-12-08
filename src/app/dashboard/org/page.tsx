@@ -3,7 +3,7 @@ import ManageOrgCard from "@/components/dashboard/manage-org";
 export default function () {
   return (
     <>
-      <div className="max-w-5xl mx-auto space-y-8 px-2 md:px-3">
+      <div className="max-w-4xl xl:max-w-5xl w-full mx-auto space-y-8 px-2 md:px-3">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 px-4 max-sm:px-6">
           <h1 className="text-xl md:text-2xl xl:text-3xl font-semibold">
             Manage Organisations

@@ -4,7 +4,7 @@ export type ProtectProps = React.PropsWithChildren<
   (
     | {
         condition?: never;
-        role: string;
+        role: string | string[];
         permission?: never;
       }
     | {

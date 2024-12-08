@@ -15,7 +15,7 @@ export default async function Dashboard() {
 
   return (
     <>
-      <div className="max-w-5xl mx-auto space-y-8 px-2">
+      <div className="max-w-4xl xl:max-w-5xl w-full mx-auto space-y-8 px-2">
         <div className="w-full flex items-center">
           <div className="flex-grow flex flex-col">
             <h1 className="text-xl md:text-2xl xl:text-3xl font-bold">
