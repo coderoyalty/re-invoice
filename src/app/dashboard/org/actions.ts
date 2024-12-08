@@ -8,9 +8,13 @@ import { z } from "zod";
 import {
   ALL_PERMISSIONS,
   SYSTEM_ROLES,
-  USER_ROLE_PERMISSIONS,
+  MEMBER_ROLE_PERMISSIONS,
+  ADMIN_ROLE_PERMISSIONS,
+  OWNER_ROLE_PERMISSIONS,
+  MANAGER_ROLE_PERMISSIONS,
 } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 const createOrgSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -30,35 +34,37 @@ export const createOrgAction = authenticatedAction
           creatorId: ctx.user.id,
           businessType: input.type,
 
-          permissions: {
-            createMany: {
-              data: ALL_PERMISSIONS.map((value) => {
-                const namePart = value.includes(":")
-                  ? value.split(":")[1]
-                  : value;
-                return {
-                  key: value,
-                  name: namePart.toUpperCase().replace("_", " "),
-                };
-              }),
-            },
-          },
-        },
-        include: {
-          permissions: true,
+          permissions: ALL_PERMISSIONS,
         },
       });
 
-      const adminRole = await tx.role.create({
+      const ownerRole = await tx.role.create({
+        data: {
+          key: SYSTEM_ROLES.OWNER,
+          name: "Owner",
+          orgId: newOrg.id,
+          systemRole: true,
+          permissions: OWNER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
+        },
+      });
+
+      await tx.role.create({
         data: {
           key: SYSTEM_ROLES.ADMIN,
           name: "Admin",
           orgId: newOrg.id,
-          permissions: {
-            connect: newOrg.permissions.map((permission) => ({
-              id: permission.id,
-            })),
-          },
+          systemRole: true,
+          permissions: ADMIN_ROLE_PERMISSIONS as Prisma.JsonArray,
+        },
+      });
+
+      await tx.role.create({
+        data: {
+          key: SYSTEM_ROLES.MANAGER,
+          name: "Manager",
+          orgId: newOrg.id,
+          systemRole: true,
+          permissions: MANAGER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
         },
       });
 
@@ -67,13 +73,8 @@ export const createOrgAction = authenticatedAction
           key: SYSTEM_ROLES.MEMBER,
           name: "Member",
           orgId: newOrg.id,
-          permissions: {
-            connect: newOrg.permissions
-              .filter(({ key }) => USER_ROLE_PERMISSIONS.includes(key as any))
-              .map((permission) => ({
-                id: permission.id,
-              })),
-          },
+          systemRole: true,
+          permissions: MEMBER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
         },
       });
 
@@ -81,7 +82,7 @@ export const createOrgAction = authenticatedAction
         data: {
           orgId: newOrg.id,
           userId: newOrg.creatorId,
-          roleId: adminRole.id,
+          roleId: ownerRole.id,
         },
       });
 

@@ -4,6 +4,7 @@ import * as session from "@/lib/server/session";
 import { getSessionCookie } from "./server/cookies";
 import prisma from "./prisma";
 import { createCheckAuthorization } from "./authorization";
+import { Prisma } from "@prisma/client";
 
 export const getCurrentUser = async () => {
   const sessionId = getSessionCookie();
@@ -88,14 +89,9 @@ export async function signedInAuthObject(
       include: {
         members: {
           include: {
-            role: {
-              include: {
-                permissions: true,
-              },
-            },
+            role: true,
           },
         },
-        permissions: true,
       },
     });
 
@@ -105,10 +101,22 @@ export async function signedInAuthObject(
 
     orgId = organisation ? organisation.id : undefined;
     orgRole = organisation && orgMember ? orgMember.role.key : undefined;
+    /*
     orgPermissions =
       organisation && orgMember
-        ? orgMember.role.permissions.map((permission) => permission.key)
-        : undefined;
+        ? orgMember.map((permission) => permission.key)
+        : undefined; */
+    if (
+      organisation &&
+      orgMember &&
+      typeof orgMember.role.permissions === "object" &&
+      Array.isArray(orgMember.role.permissions)
+    ) {
+      const permissions = orgMember.role.permissions as string[];
+      orgPermissions = permissions;
+    } else {
+      orgPermissions = undefined;
+    }
   }
 
   const authObject: SignedInAuthObject = {

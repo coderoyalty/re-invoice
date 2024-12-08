@@ -87,9 +87,8 @@ model Organisation {
   members OrganisationMember[] @relation("OrganisationMembers")
 
   invoices                Invoice[]
-  activeOrganisationsUser User[]       @relation("ActiveOrg")
+  activeOrganisationsUser User[]    @relation("ActiveOrg")
   roles                   Role[]
-  permissions             Permission[]
 
   @@index([creatorId])
 }
@@ -121,7 +120,8 @@ model Role {
 
   orgId        String
   organisation Organisation @relation(fields: [orgId], references: [id])
-  permissions  Permission[] @relation("RolePermissions")
+  systemRole   Boolean      @default(false)
+  permissions  Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -130,19 +130,6 @@ model Role {
 
   @@unique([orgId, key])
   @@index([key])
-}
-
-model Permission {
-  id          String  @id @default(cuid())
-  name        String
-  key         String
-  description String?
-
-  roles        Role[]       @relation("RolePermissions")
-  organisation Organisation @relation(fields: [orgId], references: [id])
-  orgId        String
-
-  @@unique([orgId, key])
 }
 
 enum BusinessType {

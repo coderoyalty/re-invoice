@@ -1,6 +1,5 @@
 "use client";
 import { NavUser } from "@/components/dashboard/nav-user";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogTrigger,
@@ -79,25 +78,23 @@ export function NavMain() {
         <SidebarGroupLabel>Application</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            {items.map((item) => (
-              <>
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className="p-2"
-                    onClick={() => {
-                      if (isMobile) {
-                        toggleSidebar();
-                      }
-                    }}
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      {item.title}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </>
+            {items.map((item, key) => (
+              <SidebarMenuItem key={key}>
+                <SidebarMenuButton
+                  asChild
+                  className="p-2"
+                  onClick={() => {
+                    if (isMobile) {
+                      toggleSidebar();
+                    }
+                  }}
+                >
+                  <Link href={item.url}>
+                    <item.icon />
+                    {item.title}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarGroupContent>

@@ -10,6 +10,7 @@ import { Plus, Download, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { Protect } from "../control-component";
+import { hasPermissions } from "@/lib/permissions";
 
 interface QuickActionProps extends React.ComponentPropsWithRef<typeof Card> {}
 
@@ -23,7 +24,13 @@ const QuickAction: React.FC<QuickActionProps> = (props) => {
         </CardHeader>
         <CardContent className="grid gap-4">
           <Protect
-            permission="org:sys_members:manage"
+            condition={(has) => {
+              return hasPermissions(
+                has,
+                ["org:invoices:create", "org:members:invite"],
+                true
+              );
+            }}
             fallback={
               <>
                 <p className="text-xl uppercase text-center text-secondary-foreground">
