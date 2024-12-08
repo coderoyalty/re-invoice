@@ -5,7 +5,6 @@ import { z } from "zod";
 import { onboardingSchema } from "@/app/_lib/definitions";
 import {
   ADMIN_ROLE_PERMISSIONS,
-  ALL_PERMISSIONS,
   MANAGER_ROLE_PERMISSIONS,
   MEMBER_ROLE_PERMISSIONS,
   OWNER_ROLE_PERMISSIONS,
@@ -78,48 +77,41 @@ export async function createOrganisation({
         name: name,
         creatorId: user.id,
         businessType: type,
+        businessProfile: {
+          create: {
+            ...data,
+            organisationName: name,
+          },
+        },
       },
     });
 
-    const ownerRole = await tx.role.create({
-      data: {
+    const roles = [
+      {
         key: SYSTEM_ROLES.OWNER,
         name: "Owner",
-        orgId: newOrg.id,
-        systemRole: true,
-        permissions: OWNER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
+        permissions: OWNER_ROLE_PERMISSIONS,
       },
-    });
-
-    await tx.role.create({
-      data: {
+      {
         key: SYSTEM_ROLES.ADMIN,
         name: "Admin",
-        orgId: newOrg.id,
-        systemRole: true,
-        permissions: ADMIN_ROLE_PERMISSIONS as Prisma.JsonArray,
+        permissions: ADMIN_ROLE_PERMISSIONS,
       },
-    });
-
-    await tx.role.create({
-      data: {
+      {
         key: SYSTEM_ROLES.MANAGER,
         name: "Manager",
-        orgId: newOrg.id,
-        systemRole: true,
-        permissions: MANAGER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
+        permissions: MANAGER_ROLE_PERMISSIONS,
       },
-    });
-
-    await tx.role.create({
-      data: {
+      {
         key: SYSTEM_ROLES.MEMBER,
         name: "Member",
-        orgId: newOrg.id,
-        systemRole: true,
-        permissions: MEMBER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
+        permissions: MEMBER_ROLE_PERMISSIONS,
       },
-    });
+    ];
+
+    const [ownerRole, ...otherRoles] = await Promise.all(
+      roles.map((role) => createOrgRole(tx, newOrg.id, role as any))
+    );
 
     await tx.organisationMember.create({
       data: {
@@ -165,3 +157,25 @@ export async function getUser(id: string) {
     },
   });
 }
+
+type RoleConfig = {
+  key: string;
+  name: string;
+  permissions: string[];
+};
+
+const createOrgRole = async (
+  tx: Prisma.TransactionClient,
+  orgId: string,
+  config: RoleConfig
+) => {
+  return tx.role.create({
+    data: {
+      key: config.key,
+      name: config.name,
+      orgId,
+      systemRole: true,
+      permissions: config.permissions as Prisma.JsonArray,
+    },
+  });
+};
