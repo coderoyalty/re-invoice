@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import RegistrationForm from "./form";
-import { auth } from "@/lib";
+import { auth } from "@/lib/auth";
 
 export default async () => {
-  const { user } = await auth();
+  const { userId } = await auth();
 
-  if (user !== null) {
+  if (userId !== null) {
     return redirect("/");
   }
 

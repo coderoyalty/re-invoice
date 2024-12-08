@@ -32,11 +32,12 @@ export default async function ({
     id: string;
   };
 }) {
-  const organisation = await getOrganisation(params.id);
+  const { organisation, membership } = await getOrganisation(params.id);
 
-  if (!organisation) {
+  if (!organisation || !membership) {
     notFound();
   }
+
   return (
     <>
       <div className="max-w-5xl mx-auto py-6 px-1 sm:px-4 lg:px-8">
@@ -45,11 +46,14 @@ export default async function ({
         </h1>
 
         <div className="space-y-6 p-2 sm:p-4">
-          <OrganisationInfoCard organisation={organisation} />
+          <OrganisationInfoCard
+            organisation={organisation}
+            membership={membership}
+          />
 
           <BusinessProfileCard
             orgId={organisation.id}
-            businessProfile={organisation.businessProfile}
+            businessProfile={organisation?.businessProfile}
           />
         </div>
       </div>
@@ -57,18 +61,22 @@ export default async function ({
   );
 }
 
+type GetOrganisationRT = AwaitedReturnType<typeof getOrganisation>;
+
 type OrganisationInfoCardProps = {
-  organisation: NonNullable<AwaitedReturnType<typeof getOrganisation>>;
+  organisation: GetOrganisationRT["organisation"] & {};
+  membership: GetOrganisationRT["membership"] & {};
 };
 
 type BusinessProfileCardProps = {
-  businessProfile: NonNullable<
-    AwaitedReturnType<typeof getOrganisation>
-  >["businessProfile"];
+  businessProfile: any;
   orgId: string;
 };
 
-function OrganisationInfoCard({ organisation }: OrganisationInfoCardProps) {
+function OrganisationInfoCard({
+  organisation,
+  membership,
+}: OrganisationInfoCardProps) {
   const format = useFormatter();
   return (
     <Card>
@@ -103,6 +111,10 @@ function OrganisationInfoCard({ organisation }: OrganisationInfoCardProps) {
             >
               {organisation.businessType}
             </span>
+          </div>
+          <div className="space-y-1">
+            <Label>Role</Label>
+            <p className="text-base text-orange-500">{membership.role.name}</p>
           </div>
           <div>
             <Label>Created At</Label>

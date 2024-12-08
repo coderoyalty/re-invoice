@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -9,6 +8,9 @@ import {
 } from "../ui/select";
 import { fetchUserOrgs } from "@/lib/dashboard/data";
 import React from "react";
+import { useServerAction } from "zsa-react";
+import { setActiveOrganisation } from "@/actions/dashboard";
+import { toast } from "@/hooks/use-toast";
 
 interface SelectOrgFormProps {
   organisations: Awaited<ReturnType<typeof fetchUserOrgs>>["organisations"];
@@ -18,11 +20,20 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
   organisations,
   defaultOrg,
 }) => {
-  const router = useRouter();
   const [value, setValue] = React.useState(defaultOrg.id);
-  const handleOnValueChange = (value: string) => {
-    setValue(value);
-    router.push(`?currentOrg=${value}`);
+
+  const { execute, isPending } = useServerAction(setActiveOrganisation);
+
+  const handleOnValueChange = async (value: string) => {
+    try {
+      await execute({ orgId: value });
+      setValue(value);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        description: "'Failed to update organisation",
+      });
+    }
   };
 
   return (
@@ -33,6 +44,7 @@ const SelectOrgForm: React.FC<SelectOrgFormProps> = ({
           defaultValue={defaultOrg.id}
           value={value}
           onValueChange={handleOnValueChange}
+          disabled={isPending}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select organization" />

@@ -1,17 +1,15 @@
-import { auth } from "@/lib";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
 export default async function ({ children }: { children?: React.ReactNode }) {
-  const { user } = await auth();
+  const { userId, orgId } = await auth();
 
-  if (!user) {
+  if (!userId) {
     return redirect("/login");
   }
 
-  const { defaultOrganisation } = user;
-
-  if (defaultOrganisation) {
+  if (orgId !== undefined) {
     return redirect("/dashboard");
   }
 

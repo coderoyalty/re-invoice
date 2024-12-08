@@ -1,6 +1,14 @@
 "use client";
 import { NavUser } from "@/components/dashboard/nav-user";
 import {
+  Dialog,
+  DialogTrigger,
+  DialogHeader,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -14,11 +22,18 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { auth } from "@/lib";
 import { AwaitedReturnType } from "@/lib/types";
-import { Building2, FileText, LayoutDashboard, Receipt } from "lucide-react";
+import { getUser } from "@/lib/users/data";
+import {
+  Building2,
+  FileText,
+  LayoutDashboard,
+  Plus,
+  Receipt,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { CreateOrganisationForm } from "./org/form";
 
 const items = [
   {
@@ -63,25 +78,23 @@ export function NavMain() {
         <SidebarGroupLabel>Application</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            {items.map((item) => (
-              <>
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className="p-2"
-                    onClick={() => {
-                      if (isMobile) {
-                        toggleSidebar();
-                      }
-                    }}
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      {item.title}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </>
+            {items.map((item, key) => (
+              <SidebarMenuItem key={key}>
+                <SidebarMenuButton
+                  asChild
+                  className="p-2"
+                  onClick={() => {
+                    if (isMobile) {
+                      toggleSidebar();
+                    }
+                  }}
+                >
+                  <Link href={item.url}>
+                    <item.icon />
+                    {item.title}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarGroupContent>
@@ -90,10 +103,42 @@ export function NavMain() {
   );
 }
 
+export function NavOrganisationAction() {
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>Actions</SidebarGroupLabel>
+
+      <SidebarGroupContent>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <Dialog>
+              <SidebarMenuButton asChild>
+                <DialogTrigger>
+                  <Plus />
+                  Create Organisation
+                </DialogTrigger>
+              </SidebarMenuButton>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Create Organisation</DialogTitle>
+                  <DialogDescription>
+                    Create a new organisation
+                  </DialogDescription>
+                </DialogHeader>
+                <CreateOrganisationForm />
+              </DialogContent>
+            </Dialog>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}
+
 export function DashboardSidebar({
   user,
 }: {
-  user: AwaitedReturnType<typeof auth>["user"] & {};
+  user: AwaitedReturnType<typeof getUser> & {};
 }) {
   return (
     <>
@@ -103,6 +148,7 @@ export function DashboardSidebar({
         </SidebarHeader>
         <SidebarContent>
           <NavMain />
+          <NavOrganisationAction />
         </SidebarContent>
         <SidebarFooter>
           <NavUser

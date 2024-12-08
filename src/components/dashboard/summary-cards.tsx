@@ -1,11 +1,11 @@
 "use client";
+import React from "react";
 import { DollarSign, User, Building, Users, Table2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { fetchInvoiceSummary } from "@/lib/dashboard/data";
-import React from "react";
-import { useSearchParams } from "next/navigation";
 import SummaryCardsSkeleton from "../ui/skeletons/summary-cards";
 import { AwaitedReturnType } from "@/lib/types";
+import { InvoiceSummaryResponse } from "@/app/api/organisations/summary/route";
 
 function formatWithSign(value: number) {
   return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
@@ -119,7 +119,7 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
-export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
+export default function SummaryCards({ orgId }: { orgId: string }) {
   const [data, setData] = React.useState<
     AwaitedReturnType<typeof fetchInvoiceSummary>
   >({} as any);
@@ -129,24 +129,19 @@ export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
     pending: true,
   });
 
-  const param = useSearchParams();
-  const currentOrg = param.get("currentOrg");
-
   React.useEffect(() => {
     const fetchData = async () => {
       setState({ pending: true, error: false });
       try {
-        const org = currentOrg ?? defaultOrg;
-
-        const url = `/api/organisations/${org}/summary`;
+        const url = `/api/organisations/summary`; // TODO: should take orgId? (currently fetches the active organisation summary)
         const res = await fetch(url, { method: "GET" });
 
         if (!res.ok) {
           throw new Error();
         }
 
-        const result = await res.json();
-        setData(result);
+        const result: InvoiceSummaryResponse = await res.json();
+        setData(result.data);
       } catch (err) {
         setState((prev) => ({ ...prev, error: true }));
       } finally {
@@ -155,7 +150,7 @@ export default function SummaryCards({ defaultOrg }: { defaultOrg: string }) {
     };
 
     fetchData();
-  }, [currentOrg]);
+  }, [orgId]);
 
   if (state.pending) {
     return <SummaryCardsSkeleton />;

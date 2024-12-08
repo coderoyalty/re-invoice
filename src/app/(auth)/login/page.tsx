@@ -1,11 +1,11 @@
+import { auth } from "@/lib/auth";
 import LoginForm from "./form";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib";
 
 export default async () => {
-  const { user } = await auth();
+  const { userId } = await auth();
 
-  if (user !== null) {
+  if (userId !== null) {
     return redirect("/dashboard");
   }
 

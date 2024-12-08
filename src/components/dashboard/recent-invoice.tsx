@@ -25,7 +25,6 @@ import {
 import React from "react";
 import { fetchRecentInvoices } from "@/lib/dashboard/data";
 import { AwaitedReturnType } from "@/lib/types";
-import { useSearchParams } from "next/navigation";
 import RecentInvoiceSkeleton from "../ui/skeletons/recent-invoice";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
@@ -71,14 +70,12 @@ const statusToBadge = (
 
 interface RecentInvoiceTableProps
   extends React.ComponentPropsWithRef<typeof Card> {
-  defaultOrg: string;
+  orgId: string;
 }
 
 const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
-  defaultOrg,
+  orgId,
   ...props
-}: {
-  defaultOrg: string;
 }) => {
   const [invoices, setInvoices] = React.useState<
     AwaitedReturnType<typeof fetchRecentInvoices>
@@ -89,16 +86,14 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     pending: true,
   });
 
-  const searchParams = useSearchParams();
-  const currentOrg = searchParams.get("currentOrg");
-
   React.useEffect(() => {
     const fetchData = async () => {
+      if (!orgId) {
+        return;
+      }
       setState({ pending: true, error: false });
 
-      const org = currentOrg ?? defaultOrg;
-
-      const url = `/api/organisations/${org}/invoices/recent`;
+      const url = `/api/organisations/${orgId}/invoices/recent`;
 
       try {
         const req = await fetch(url, { method: "GET" });
@@ -118,7 +113,7 @@ const RecentInvoiceTable: React.FC<RecentInvoiceTableProps> = ({
     };
 
     fetchData();
-  }, [currentOrg]);
+  }, [orgId]);
 
   if (state.pending) {
     return <RecentInvoiceSkeleton {...props} />;
