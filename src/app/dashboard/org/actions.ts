@@ -32,9 +32,7 @@ export const createOrgAction = authenticatedAction
         data: {
           name: input.name,
           creatorId: ctx.user.id,
-          businessType: input.type,
-
-          permissions: ALL_PERMISSIONS,
+          businessType: input.type as any,
         },
       });
 
