@@ -78,8 +78,6 @@ export async function createOrganisation({
         name: name,
         creatorId: user.id,
         businessType: type,
-
-        permissions: ALL_PERMISSIONS,
       },
     });
 
