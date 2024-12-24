@@ -1,25 +1,28 @@
 import DashboardHeader from "@/components/dashboard/header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { auth } from "@/lib";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import React from "react";
 import { DashboardSidebar } from "./components";
 import { cookies } from "next/headers";
+import { getUser } from "@/lib/users/data";
 
 export default async function DashboardLayout({
   children,
 }: {
   children?: React.ReactNode;
 }) {
-  const { user } = await auth();
+  const { userId, orgId } = await auth();
 
-  if (!user) {
+  if (!userId) {
     return redirect("/login");
   }
 
-  if (!user.defaultOrganisation) {
+  if (orgId === undefined) {
     return redirect("/onboarding/");
   }
+
+  const user = await getUser(userId);
 
   const cookieStore = cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
@@ -27,13 +30,11 @@ export default async function DashboardLayout({
   return (
     <>
       <SidebarProvider defaultOpen={defaultOpen}>
-        <DashboardSidebar user={user} />
+        <DashboardSidebar user={user!} />
         <SidebarInset>
           <DashboardHeader />
-          <div className="flex flex-col min-h-screen w-full">
-            <main className="flex-1 py-6 px-[2px] md:px-2 lg:px-8">
-              {children}
-            </main>
+          <div className="flex flex-col min-h-screen w-full mt-4 md:mt-6 lg:mt-8">
+            {children}
           </div>
         </SidebarInset>
       </SidebarProvider>

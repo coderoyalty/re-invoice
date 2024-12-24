@@ -24,6 +24,8 @@ import {
 import { BusinessProfileForm } from "./form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFormatter } from "next-intl";
+import { Protect } from "@/components/control-component";
+import { hasPermissions } from "@/lib/permissions";
 
 export default async function ({
   params,
@@ -32,24 +34,28 @@ export default async function ({
     id: string;
   };
 }) {
-  const organisation = await getOrganisation(params.id);
+  const { organisation, membership } = await getOrganisation(params.id);
 
-  if (!organisation) {
+  if (!organisation || !membership) {
     notFound();
   }
+
   return (
     <>
-      <div className="max-w-5xl mx-auto py-6 px-1 sm:px-4 lg:px-8">
+      <div className="max-w-4xl xl:max-w-5xl w-full mx-auto py-6 px-2 sm:px-6 lg:px-12">
         <h1 className="text-2xl sm:text-3xl font-bold mb-6">
           Organisation Details
         </h1>
 
         <div className="space-y-6 p-2 sm:p-4">
-          <OrganisationInfoCard organisation={organisation} />
+          <OrganisationInfoCard
+            organisation={organisation}
+            membership={membership}
+          />
 
           <BusinessProfileCard
             orgId={organisation.id}
-            businessProfile={organisation.businessProfile}
+            businessProfile={organisation?.businessProfile}
           />
         </div>
       </div>
@@ -57,18 +63,22 @@ export default async function ({
   );
 }
 
+type GetOrganisationRT = AwaitedReturnType<typeof getOrganisation>;
+
 type OrganisationInfoCardProps = {
-  organisation: NonNullable<AwaitedReturnType<typeof getOrganisation>>;
+  organisation: GetOrganisationRT["organisation"] & {};
+  membership: GetOrganisationRT["membership"] & {};
 };
 
 type BusinessProfileCardProps = {
-  businessProfile: NonNullable<
-    AwaitedReturnType<typeof getOrganisation>
-  >["businessProfile"];
+  businessProfile: any;
   orgId: string;
 };
 
-function OrganisationInfoCard({ organisation }: OrganisationInfoCardProps) {
+function OrganisationInfoCard({
+  organisation,
+  membership,
+}: OrganisationInfoCardProps) {
   const format = useFormatter();
   return (
     <Card>
@@ -104,6 +114,10 @@ function OrganisationInfoCard({ organisation }: OrganisationInfoCardProps) {
               {organisation.businessType}
             </span>
           </div>
+          <div className="space-y-1">
+            <Label>Role</Label>
+            <p className="text-base text-orange-500">{membership.role.name}</p>
+          </div>
           <div>
             <Label>Created At</Label>
             <p>
@@ -136,27 +150,41 @@ function BusinessProfileCard({
   if (!businessProfile) {
     return (
       <div className="mx-auto flex flex-col gap-2 h-[300px] max-w-2xl items-center justify-center rounded-md border-2 border-dashed text-sm">
-        <p className="text-base font-bold uppercase">
-          Haven't created business profile yet.
-        </p>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Create Business Profile</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-3xl sm:text-2xl">
-                Business Profile
-              </DialogTitle>
-              <DialogDescription>
-                Enter your business details below
-              </DialogDescription>
-            </DialogHeader>
-            <ScrollArea className="h-96 px-3 sm:px-6 py-4 flex w-full">
-              <BusinessProfileForm orgId={orgId} />
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+        <Protect
+          role={["owner", "admin"]}
+          fallback={
+            <>
+              <p className="text-base font-bold uppercase">
+                No Business Profile Exists
+              </p>
+              <p className="text-base font-bold uppercase">
+                Only Admin Can Create Business Profile
+              </p>
+            </>
+          }
+        >
+          <p className="text-base font-bold uppercase">
+            Haven't created business profile yet.
+          </p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Create Business Profile</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="text-3xl sm:text-2xl">
+                  Business Profile
+                </DialogTitle>
+                <DialogDescription>
+                  Enter your business details below
+                </DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="h-96 px-3 sm:px-6 py-4 flex w-full">
+                <BusinessProfileForm orgId={orgId} />
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+        </Protect>
       </div>
     );
   }

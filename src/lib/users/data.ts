@@ -3,6 +3,14 @@ import prisma from "../prisma";
 import { PublicError } from "@/use-cases/errors";
 import { z } from "zod";
 import { onboardingSchema } from "@/app/_lib/definitions";
+import {
+  ADMIN_ROLE_PERMISSIONS,
+  MANAGER_ROLE_PERMISSIONS,
+  MEMBER_ROLE_PERMISSIONS,
+  OWNER_ROLE_PERMISSIONS,
+  SYSTEM_ROLES,
+} from "../permissions";
+import { Prisma } from "@prisma/client";
 
 type AccountProps = {
   displayName: string;
@@ -63,27 +71,57 @@ export async function createOrganisation({
   }
 
   // create organisation
-  const newOrg = await prisma.organisation.create({
-    data: {
-      name,
-      creatorId: user.id,
-      businessType: type as any,
-
-      // create the business profile
-      businessProfile: {
-        create: {
-          ...data,
-          organisationName: name,
+  const newOrg = await prisma.$transaction(async (tx) => {
+    const newOrg = await tx.organisation.create({
+      data: {
+        name: name,
+        creatorId: user.id,
+        businessType: type,
+        businessProfile: {
+          create: {
+            ...data,
+            organisationName: name,
+          },
         },
       },
+    });
 
-      // transactionally add user as member of the organisation
-      members: {
-        create: {
-          userId: user.id,
-        },
+    const roles = [
+      {
+        key: SYSTEM_ROLES.OWNER,
+        name: "Owner",
+        permissions: OWNER_ROLE_PERMISSIONS,
       },
-    },
+      {
+        key: SYSTEM_ROLES.ADMIN,
+        name: "Admin",
+        permissions: ADMIN_ROLE_PERMISSIONS,
+      },
+      {
+        key: SYSTEM_ROLES.MANAGER,
+        name: "Manager",
+        permissions: MANAGER_ROLE_PERMISSIONS,
+      },
+      {
+        key: SYSTEM_ROLES.MEMBER,
+        name: "Member",
+        permissions: MEMBER_ROLE_PERMISSIONS,
+      },
+    ];
+
+    const [ownerRole, ...otherRoles] = await Promise.all(
+      roles.map((role) => createOrgRole(tx, newOrg.id, role as any))
+    );
+
+    await tx.organisationMember.create({
+      data: {
+        orgId: newOrg.id,
+        userId: newOrg.creatorId,
+        roleId: ownerRole.id,
+      },
+    });
+
+    return newOrg;
   });
 
   // if first organisation created by the user, set as the default organisation
@@ -105,3 +143,39 @@ export async function createOrganisation({
     org: newOrg,
   };
 }
+
+export async function getUser(id: string) {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      avatarUrl: true,
+      displayName: true,
+      email: true,
+      id: true,
+    },
+  });
+}
+
+type RoleConfig = {
+  key: string;
+  name: string;
+  permissions: string[];
+};
+
+const createOrgRole = async (
+  tx: Prisma.TransactionClient,
+  orgId: string,
+  config: RoleConfig
+) => {
+  return tx.role.create({
+    data: {
+      key: config.key,
+      name: config.name,
+      orgId,
+      systemRole: true,
+      permissions: config.permissions as Prisma.JsonArray,
+    },
+  });
+};

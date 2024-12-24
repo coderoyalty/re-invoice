@@ -1,4 +1,6 @@
 "use client";
+
+import React from "react";
 import { signOut } from "@/actions/auth";
 import { Button } from "../ui/button";
 import {
@@ -10,15 +12,14 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { auth } from "@/lib";
-import React from "react";
 import { useRouter } from "next/navigation";
 import { slugifyInitials } from "@/lib/utils";
 import { AwaitedReturnType } from "@/lib/types";
 import Link from "next/link";
+import { getUser } from "@/lib/users/data";
 
 export interface UserDropDownProps {
-  user: AwaitedReturnType<typeof auth>["user"] & {};
+  user: AwaitedReturnType<typeof getUser> & {};
 }
 
 const UserDropDown: React.FC<UserDropDownProps> = ({ user }) => {

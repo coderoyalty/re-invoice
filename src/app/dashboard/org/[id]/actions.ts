@@ -1,16 +1,16 @@
 "use server";
 import { extendedBusinessProfileSchema } from "@/app/_lib/definitions";
-import { auth } from "@/lib";
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { authenticatedAction } from "@/lib/safe-action";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 
 export async function getOrganisation(id: string) {
-  const { user } = await auth();
+  const { userId } = await auth();
 
-  if (!user) {
-    return null;
+  if (!userId) {
+    return { organisation: null, membership: null };
   }
 
   const organisation = await prisma.organisation.findFirst({
@@ -18,18 +18,27 @@ export async function getOrganisation(id: string) {
       id: id,
       members: {
         some: {
-          userId: user.id,
+          userId,
         },
       },
     },
     include: {
       businessProfile: true,
       creator: true,
-      members: true,
+      members: {
+        include: {
+          role: true,
+          user: true,
+        },
+      },
     },
   });
 
-  return organisation;
+  return {
+    organisation,
+    membership:
+      organisation?.members.find((member) => member.userId === userId) ?? null,
+  };
 }
 
 export const createBusinessProfileAction = authenticatedAction
@@ -45,8 +54,6 @@ export const createBusinessProfileAction = authenticatedAction
         members: {
           some: {
             userId: ctx.user.id,
-            //TODO: role: ""
-            //TODO: has the permission to create/update business profile
           },
         },
       },
@@ -72,5 +79,5 @@ export const createBusinessProfileAction = authenticatedAction
       },
     });
 
-    revalidatePath("/dashboard/org/[id]");
+    revalidatePath(`/dashboard/org/${orgId}`);
   });

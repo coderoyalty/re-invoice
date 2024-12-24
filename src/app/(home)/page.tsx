@@ -2,13 +2,13 @@ import Features from "@/components/Features";
 import Hero from "@/components/Hero";
 import Pricing from "@/components/Pricing";
 import Testimonials from "@/components/Testimonials";
-import { auth } from "@/lib";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const { user } = await auth();
+  const { userId } = await auth();
 
-  if (user) {
+  if (userId) {
     return redirect("dashboard");
   }
 
