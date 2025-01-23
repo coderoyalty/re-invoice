@@ -101,7 +101,6 @@ export const MANAGER_ROLE_PERMISSIONS = [
 export const MEMBER_ROLE_PERMISSIONS = [
   PERMISSIONS["org:profile:read"],
   PERMISSIONS["org:members:read"],
-  PERMISSIONS["org:invoices:create"],
   PERMISSIONS["org:invoices:read"],
   PERMISSIONS["org:invoices:update"],
 ] as const;

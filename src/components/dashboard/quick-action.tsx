@@ -7,10 +7,12 @@ import {
 } from "@/components/ui/card";
 
 import { Plus, Download, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import React from "react";
 import { Protect } from "../control-component";
 import { hasPermissions } from "@/lib/permissions";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface QuickActionProps extends React.ComponentPropsWithRef<typeof Card> {}
 
@@ -39,10 +41,13 @@ const QuickAction: React.FC<QuickActionProps> = (props) => {
               </>
             }
           >
-            <Button className="w-full">
+            <Link
+              href={"dashboard/invoice/new"}
+              className={cn(buttonVariants(), "w-full")}
+            >
               <Plus className="mr-2 h-4 w-4" /> Create New Invoice
-            </Button>
-            <Button variant="outline" className="w-full">
+            </Link>
+            <Button variant={"outline"} className={cn("w-full")}>
               <Download className="mr-2 h-4 w-4" /> Download Reports
             </Button>
             <Button variant="outline" className="w-full">

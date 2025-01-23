@@ -1,15 +1,30 @@
 "use client";
-import React from "react";
+import React, { ComponentProps } from "react";
 import { DollarSign, User, Building, Users, Table2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { fetchInvoiceSummary } from "@/lib/dashboard/data";
 import SummaryCardsSkeleton from "../ui/skeletons/summary-cards";
 import { AwaitedReturnType } from "@/lib/types";
 import { InvoiceSummaryResponse } from "@/app/api/organisations/summary/route";
+import { cn } from "@/lib/utils";
 
 function formatWithSign(value: number) {
   return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
 }
+
+const OverlayCard = React.forwardRef<
+  HTMLDivElement,
+  ComponentProps<typeof Card>
+>(({ className, ...props }, ref) => (
+  <Card
+    className={cn(
+      className,
+      " transition-all duration-700 hover:scale-[1.1] hover:-rotate-1",
+      "drop-shadow-[6px_6px_gray] dark:drop-shadow-[6px_6px_gray] border-2 border-black dark:border-white"
+    )}
+    {...props}
+  />
+));
 
 const TotalRevenueCard: React.FC<{
   value: number;
@@ -17,7 +32,7 @@ const TotalRevenueCard: React.FC<{
 }> = ({ value, lastMonthPercent = 0.0 }) => {
   return (
     <>
-      <Card>
+      <OverlayCard>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -26,7 +41,7 @@ const TotalRevenueCard: React.FC<{
           {/* total invoices */}
           <div className="text-2xl font-bold">${value.toFixed(2)}</div>
         </CardContent>
-      </Card>
+      </OverlayCard>
     </>
   );
 };
@@ -36,7 +51,7 @@ const TotalInvoiceCard: React.FC<{
 }> = ({ value }) => {
   return (
     <>
-      <Card>
+      <OverlayCard>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Invoice</CardTitle>
           <Table2 className="h-4 w-4 text-muted-foreground" />
@@ -48,7 +63,7 @@ const TotalInvoiceCard: React.FC<{
             Across the current organization
           </p>
         </CardContent>
-      </Card>
+      </OverlayCard>
     </>
   );
 };
@@ -60,7 +75,7 @@ const InvoiceSentCard: React.FC<{
 }> = ({ value, percentDiff = 0.0, lastMonthValue }) => {
   return (
     <>
-      <Card>
+      <OverlayCard>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Invoices Sent</CardTitle>
           <User className="h-4 w-4 text-muted-foreground" />
@@ -72,7 +87,7 @@ const InvoiceSentCard: React.FC<{
             {formatWithSign(percentDiff)}% from last month ({lastMonthValue})
           </p>
         </CardContent>
-      </Card>
+      </OverlayCard>
     </>
   );
 };
@@ -80,7 +95,7 @@ const InvoiceSentCard: React.FC<{
 const TeamMembersCard: React.FC<{ value: number }> = ({ value }) => {
   return (
     <>
-      <Card>
+      <OverlayCard>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Team Members</CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
@@ -92,7 +107,7 @@ const TeamMembersCard: React.FC<{ value: number }> = ({ value }) => {
             Across all organizations
           </p>
         </CardContent>
-      </Card>
+      </OverlayCard>
     </>
   );
 };
@@ -100,7 +115,7 @@ const TeamMembersCard: React.FC<{ value: number }> = ({ value }) => {
 const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
   return (
     <>
-      <Card>
+      <OverlayCard>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Active Organizations
@@ -114,7 +129,7 @@ const ActiveOrgCard: React.FC<{ value: number }> = ({ value }) => {
             {value} active organizations
           </p>
         </CardContent>
-      </Card>
+      </OverlayCard>
     </>
   );
 };
