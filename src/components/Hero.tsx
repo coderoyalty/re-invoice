@@ -22,7 +22,11 @@ export default function Hero() {
                   inconsolata.className
                 )}
               >
-                Create Professional Invoices in Minutes
+                Create
+                <span className="px-5 py-3 bg-blue-400 border-black dark:border-white border m-3 drop-shadow-[4px_6px_#2a2a2a] dark:drop-shadow-[4px_6px_#f4f3f2] inline-block -rotate-1 rounded-full">
+                  Professional Invoices
+                </span>
+                in Minutes
               </h1>
               <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
                 Invoicely helps you generate, manage, and send invoices
