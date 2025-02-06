@@ -15,6 +15,7 @@ import {
 } from "@/lib/permissions";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import { checkPermission } from "@/lib/permission";
 
 const createOrgSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -36,43 +37,9 @@ export const createOrgAction = authenticatedAction
         },
       });
 
-      const ownerRole = await tx.role.create({
-        data: {
-          key: SYSTEM_ROLES.OWNER,
+      const role = await tx.role.findUniqueOrThrow({
+        where: {
           name: "Owner",
-          orgId: newOrg.id,
-          systemRole: true,
-          permissions: OWNER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
-        },
-      });
-
-      await tx.role.create({
-        data: {
-          key: SYSTEM_ROLES.ADMIN,
-          name: "Admin",
-          orgId: newOrg.id,
-          systemRole: true,
-          permissions: ADMIN_ROLE_PERMISSIONS as Prisma.JsonArray,
-        },
-      });
-
-      await tx.role.create({
-        data: {
-          key: SYSTEM_ROLES.MANAGER,
-          name: "Manager",
-          orgId: newOrg.id,
-          systemRole: true,
-          permissions: MANAGER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
-        },
-      });
-
-      await tx.role.create({
-        data: {
-          key: SYSTEM_ROLES.MEMBER,
-          name: "Member",
-          orgId: newOrg.id,
-          systemRole: true,
-          permissions: MEMBER_ROLE_PERMISSIONS as unknown as Prisma.JsonArray,
         },
       });
 
@@ -80,7 +47,7 @@ export const createOrgAction = authenticatedAction
         data: {
           orgId: newOrg.id,
           userId: newOrg.creatorId,
-          roleId: ownerRole.id,
+          roleId: role.id,
         },
       });
 

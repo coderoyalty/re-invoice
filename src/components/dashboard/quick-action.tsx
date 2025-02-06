@@ -9,8 +9,6 @@ import {
 import { Plus, Download, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { Protect } from "../control-component";
-import { hasPermissions } from "@/lib/permissions";
 import PermissionGuard from "../auth/permission-guard";
 
 interface QuickActionProps extends React.ComponentPropsWithRef<typeof Card> {
