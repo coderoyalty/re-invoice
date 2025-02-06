@@ -4,7 +4,6 @@ import * as session from "@/lib/server/session";
 import { getSessionCookie } from "./server/cookies";
 import prisma from "./prisma";
 import { createCheckAuthorization } from "./authorization";
-import { Prisma } from "@prisma/client";
 
 export const getCurrentUser = async () => {
   const sessionId = getSessionCookie();
@@ -43,9 +42,6 @@ interface SignedInAuthObject {
   userId: string;
   orgId: string | undefined;
   orgRole: string | undefined;
-  orgPermissions: string[] | undefined;
-
-  has: CheckAuthorizationWithCustomPermissions;
 }
 
 type SignedOutAuthObject = {
@@ -53,9 +49,6 @@ type SignedOutAuthObject = {
   userId: null;
   orgId: null;
   orgRole: null;
-  orgPermissions: null;
-
-  has: CheckAuthorizationWithCustomPermissions;
 };
 
 export function signedOutAuthObject(): SignedOutAuthObject {
@@ -64,11 +57,6 @@ export function signedOutAuthObject(): SignedOutAuthObject {
     userId: null,
     orgId: null,
     orgRole: null,
-    orgPermissions: null,
-
-    has: (_isAuthorizedParams) => {
-      return false;
-    },
   };
 }
 
@@ -79,7 +67,6 @@ export async function signedInAuthObject(
   const userId = user.id;
   let orgId = undefined;
   let orgRole = undefined;
-  let orgPermissions = undefined;
 
   if (user.activeOrganisation?.id ?? user.defaultOrganisation?.id) {
     const organisation = await prisma.organisation.findUnique({
@@ -100,23 +87,7 @@ export async function signedInAuthObject(
     );
 
     orgId = organisation ? organisation.id : undefined;
-    orgRole = organisation && orgMember ? orgMember.role.key : undefined;
-    /*
-    orgPermissions =
-      organisation && orgMember
-        ? orgMember.map((permission) => permission.key)
-        : undefined; */
-    if (
-      organisation &&
-      orgMember &&
-      typeof orgMember.role.permissions === "object" &&
-      Array.isArray(orgMember.role.permissions)
-    ) {
-      const permissions = orgMember.role.permissions as string[];
-      orgPermissions = permissions;
-    } else {
-      orgPermissions = undefined;
-    }
+    orgRole = organisation && orgMember ? orgMember.role.name : undefined;
   }
 
   const authObject: SignedInAuthObject = {
@@ -124,8 +95,6 @@ export async function signedInAuthObject(
     userId,
     orgId,
     orgRole,
-    orgPermissions,
-    has: createCheckAuthorization({ orgId, orgPermissions, orgRole, userId }),
   };
 
   return authObject;

@@ -104,6 +104,8 @@ model OrganisationMember {
   roleId String
   role   Role   @relation(fields: [roleId], references: [id])
 
+  isBlocked Boolean @default(false)
+
   user         User         @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
   organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id], onDelete: Cascade)
 
