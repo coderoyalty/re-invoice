@@ -9,7 +9,7 @@ interface PermissionGuardProps {
   children?: React.ReactNode;
   fallback?: React.AwaitedReactNode;
 }
-const PermissionGuard: React.FC<PermissionGuardProps> = async ({
+const PermissionGuard_: React.FC<PermissionGuardProps> = async ({
   action,
   entity,
   orgId,
@@ -24,5 +24,7 @@ const PermissionGuard: React.FC<PermissionGuardProps> = async ({
 
   return hasPermission ? <>{children}</> : fallback;
 };
+
+const PermissionGuard = React.memo(PermissionGuard_);
 
 export default PermissionGuard;
