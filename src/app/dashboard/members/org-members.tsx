@@ -19,7 +19,13 @@ import { fetchMembers } from "@/lib/dashboard/data";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-async function MembersTable({ orgId }: { orgId: string }) {
+async function MembersTable({
+  orgId,
+  userId,
+}: {
+  orgId: string;
+  userId: string;
+}) {
   const members = await fetchMembers(orgId);
 
   return (
@@ -46,13 +52,18 @@ async function MembersTable({ orgId }: { orgId: string }) {
           </TableCell>
           <PermissionGuard action="VIEW" entity="USER" orgId={orgId}>
             <TableCell className="font-semibold  uppercase text-sm text-center">
-              <Button
-                disabled={member.role.name.toLowerCase() === "owner"}
-                size={"sm"}
-                variant={"destructive"}
-              >
-                Block
-              </Button>
+              {userId === member.user.id ? (
+                <span>You can not block yourself</span>
+              ) : (
+                <Button
+                  disabled={member.role.name.toLowerCase() === "owner"}
+                  size={"sm"}
+                  variant={member.isBlocked ? "default" : "destructive"}
+                  className=" disabled:cursor-not-allowed"
+                >
+                  {member.isBlocked ? "Unblock" : "Block"}
+                </Button>
+              )}
             </TableCell>
           </PermissionGuard>
         </TableRow>
@@ -61,7 +72,13 @@ async function MembersTable({ orgId }: { orgId: string }) {
   );
 }
 
-export default function OrganizationMembers({ orgId }: { orgId: string }) {
+export default function OrganizationMembers({
+  orgId,
+  userId,
+}: {
+  orgId: string;
+  userId: string;
+}) {
   return (
     <>
       <Card>
@@ -83,7 +100,7 @@ export default function OrganizationMembers({ orgId }: { orgId: string }) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <MembersTable orgId={orgId} />
+                <MembersTable orgId={orgId} userId={userId} />
               </TableBody>
             </Table>
           </div>
