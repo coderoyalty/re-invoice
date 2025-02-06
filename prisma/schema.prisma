@@ -88,7 +88,6 @@ model Organisation {
 
   invoices                Invoice[]
   activeOrganisationsUser User[]    @relation("ActiveOrg")
-  roles                   Role[]
 
   @@index([creatorId])
 }
@@ -103,33 +102,45 @@ model OrganisationMember {
   updatedAt DateTime @updatedAt
 
   roleId String
-  role   Role   @relation("MembershipRole", fields: [roleId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
 
   user         User         @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
   organisation Organisation @relation("OrganisationMembers", fields: [orgId], references: [id], onDelete: Cascade)
 
   @@unique([userId, orgId]) // prevent duplicate role keys within the same organisation
-  @@index([userId, orgId])
+  @@index([roleId])
+}
+
+model Permission {
+  id String @id @default(cuid())
+
+  action String // e.g CREATE, READ,  UPDATE, DELETE, MANAGE
+  entity String // e.g ORGANISATION, PROJECT, USER etc.
+  scope  String // e.g ANY, ORGANISATION, OWN etc.
+
+  description String
+
+  roles RolePermission[]
+
+  @@unique([action, entity, scope])
 }
 
 model Role {
-  id          String  @id @default(cuid())
-  name        String
-  key         String
-  description String?
+  id   String @id @default(cuid())
+  name String @unique // e.g., Project Manager, Viewer
 
-  orgId        String
-  organisation Organisation @relation(fields: [orgId], references: [id])
-  systemRole   Boolean      @default(false)
-  permissions  Json
+  permissions RolePermission[]
+  members     OrganisationMember[]
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model RolePermission {
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
 
-  assignedMembers OrganisationMember[] @relation("MembershipRole")
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id])
 
-  @@unique([orgId, key])
-  @@index([key])
+  @@id([roleId, permissionId])
 }
 
 enum BusinessType {
