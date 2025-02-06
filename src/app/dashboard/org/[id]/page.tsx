@@ -24,8 +24,7 @@ import {
 import { BusinessProfileForm } from "./form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFormatter } from "next-intl";
-import { Protect } from "@/components/control-component";
-import { hasPermissions } from "@/lib/permissions";
+import PermissionGuard from "@/components/auth/permission-guard";
 
 export default async function ({
   params,
@@ -150,8 +149,10 @@ function BusinessProfileCard({
   if (!businessProfile) {
     return (
       <div className="mx-auto flex flex-col gap-2 h-[300px] max-w-2xl items-center justify-center rounded-md border-2 border-dashed text-sm">
-        <Protect
-          role={["owner", "admin"]}
+        <PermissionGuard
+          action="CREATE"
+          entity="ORGANIZATION"
+          orgId={orgId}
           fallback={
             <>
               <p className="text-base font-bold uppercase">
@@ -184,7 +185,7 @@ function BusinessProfileCard({
               </ScrollArea>
             </DialogContent>
           </Dialog>
-        </Protect>
+        </PermissionGuard>
       </div>
     );
   }

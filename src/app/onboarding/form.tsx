@@ -70,7 +70,7 @@ const DefaultOrgForm = ({
   return (
     <>
       <Form {...form}>
-        <Card className="mx-auto w-full max-w-sm">
+        <Card className="mx-auto w-full max-w-sm sm:max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl sm:text-2xl">
               Create Default Organisation
@@ -430,7 +430,7 @@ const OnboardingForm = () => {
   }, [error]);
 
   return (
-    <div className="space-y-8 max-w-sm sm:max-w-lg">
+    <div className="space-y-8 max-w-sm sm:max-w-xl md:max-w-2xl">
       <Stepper amount={2} currentStep={index} />
       {index === 1 && (
         <DefaultOrgForm

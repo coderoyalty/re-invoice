@@ -3,14 +3,6 @@ import prisma from "../prisma";
 import { PublicError } from "@/use-cases/errors";
 import { z } from "zod";
 import { onboardingSchema } from "@/app/_lib/definitions";
-import {
-  ADMIN_ROLE_PERMISSIONS,
-  MANAGER_ROLE_PERMISSIONS,
-  MEMBER_ROLE_PERMISSIONS,
-  OWNER_ROLE_PERMISSIONS,
-  SYSTEM_ROLES,
-} from "../permissions";
-import { Prisma } from "@prisma/client";
 
 type AccountProps = {
   displayName: string;
@@ -86,38 +78,17 @@ export async function createOrganisation({
       },
     });
 
-    const roles = [
-      {
-        key: SYSTEM_ROLES.OWNER,
+    const role = await tx.role.findUniqueOrThrow({
+      where: {
         name: "Owner",
-        permissions: OWNER_ROLE_PERMISSIONS,
       },
-      {
-        key: SYSTEM_ROLES.ADMIN,
-        name: "Admin",
-        permissions: ADMIN_ROLE_PERMISSIONS,
-      },
-      {
-        key: SYSTEM_ROLES.MANAGER,
-        name: "Manager",
-        permissions: MANAGER_ROLE_PERMISSIONS,
-      },
-      {
-        key: SYSTEM_ROLES.MEMBER,
-        name: "Member",
-        permissions: MEMBER_ROLE_PERMISSIONS,
-      },
-    ];
-
-    const [ownerRole, ...otherRoles] = await Promise.all(
-      roles.map((role) => createOrgRole(tx, newOrg.id, role as any))
-    );
+    });
 
     await tx.organisationMember.create({
       data: {
         orgId: newOrg.id,
         userId: newOrg.creatorId,
-        roleId: ownerRole.id,
+        roleId: role.id,
       },
     });
 
@@ -157,25 +128,3 @@ export async function getUser(id: string) {
     },
   });
 }
-
-type RoleConfig = {
-  key: string;
-  name: string;
-  permissions: string[];
-};
-
-const createOrgRole = async (
-  tx: Prisma.TransactionClient,
-  orgId: string,
-  config: RoleConfig
-) => {
-  return tx.role.create({
-    data: {
-      key: config.key,
-      name: config.name,
-      orgId,
-      systemRole: true,
-      permissions: config.permissions as Prisma.JsonArray,
-    },
-  });
-};
