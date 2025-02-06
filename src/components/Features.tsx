@@ -31,7 +31,7 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="w-full sm:min-h-[70dvh] py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800 dark:text-gray-100"
+      className="w-full sm:min-h-[70dvh] py-12 md:py-24 lg:py-32 dark:text-gray-100"
     >
       <div className="container px-4 md:px-6 mx-auto">
         <h2 className="text-2xl font-bold tracking-tighter sm:text-4xl text-center mb-12">
