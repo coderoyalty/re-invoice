@@ -173,3 +173,32 @@ export async function fetchInvoiceSummary() {
     activeOrganisations: memberships.length,
   };
 }
+
+export async function fetchMembers(orgId: string) {
+  const { userId } = await auth();
+
+  if (!userId) return redirect("/login");
+
+  const members = await prisma.organisationMember.findMany({
+    where: {
+      orgId,
+    },
+    include: {
+      role: {
+        select: {
+          name: true,
+        },
+      },
+      user: {
+        select: {
+          email: true,
+          displayName: true,
+          avatarUrl: true,
+          id: true,
+        },
+      },
+    },
+  });
+
+  return members;
+}

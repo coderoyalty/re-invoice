@@ -27,9 +27,11 @@ import { getUser } from "@/lib/users/data";
 import {
   Building2,
   FileText,
+  Group,
   LayoutDashboard,
   Plus,
   Receipt,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -50,6 +52,11 @@ const items = [
     url: "/dashboard/invoices",
     icon: Receipt,
     title: "Invoices",
+  },
+  {
+    url: "/dashboard/members",
+    icon: Users,
+    title: "Members",
   },
 ];
 
