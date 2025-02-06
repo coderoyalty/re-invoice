@@ -194,6 +194,7 @@ export async function fetchMembers(orgId: string) {
           email: true,
           displayName: true,
           avatarUrl: true,
+          id: true,
         },
       },
     },

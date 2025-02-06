@@ -21,7 +21,7 @@ export default async function () {
           </h1>
         </div>
         <section className="bg-primary-foreground py-4 px-2 sm:px-3 lg:px-4 rounded-md shadow-md">
-          <OrganizationMembers orgId={orgId} />
+          <OrganizationMembers orgId={orgId} userId={userId} />
         </section>
       </div>
     </>
