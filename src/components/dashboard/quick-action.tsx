@@ -11,10 +11,16 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { Protect } from "../control-component";
 import { hasPermissions } from "@/lib/permissions";
+import PermissionGuard from "../auth/permission-guard";
 
-interface QuickActionProps extends React.ComponentPropsWithRef<typeof Card> {}
+interface QuickActionProps extends React.ComponentPropsWithRef<typeof Card> {
+  currentOrgId: string;
+}
 
-const QuickAction: React.FC<QuickActionProps> = (props) => {
+const QuickAction: React.FC<QuickActionProps> = ({
+  currentOrgId,
+  ...props
+}) => {
   return (
     <>
       <Card {...props}>
@@ -23,14 +29,10 @@ const QuickAction: React.FC<QuickActionProps> = (props) => {
           <CardDescription>Manage invoices and team.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <Protect
-            condition={(has) => {
-              return hasPermissions(
-                has,
-                ["org:invoices:create", "org:members:invite"],
-                true
-              );
-            }}
+          <PermissionGuard
+            action="MANAGE"
+            entity="ORGANIZATION"
+            orgId={currentOrgId}
             fallback={
               <>
                 <p className="text-xl uppercase text-center text-secondary-foreground">
@@ -48,7 +50,7 @@ const QuickAction: React.FC<QuickActionProps> = (props) => {
             <Button variant="outline" className="w-full">
               <Users className="mr-2 h-4 w-4" /> Invite Team Member
             </Button>
-          </Protect>
+          </PermissionGuard>
         </CardContent>
       </Card>
     </>

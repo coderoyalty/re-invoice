@@ -13,6 +13,10 @@ export default async function Dashboard() {
     return redirect("/login");
   }
 
+  if (!orgId) {
+    return redirect("/onboarding");
+  }
+
   return (
     <>
       <div className="max-w-4xl xl:max-w-5xl w-full mx-auto space-y-8 px-2">
@@ -27,7 +31,7 @@ export default async function Dashboard() {
           </div>
         </div>
         <section className="bg-primary-foreground py-4 px-1 sm:px-2 md:px-3 lg:px-4 rounded-md shadow-md">
-          <SummaryCards orgId={orgId!} />
+          <SummaryCards orgId={orgId} />
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             {orgId ? (
               <>
@@ -41,7 +45,10 @@ export default async function Dashboard() {
                 </p>
               </>
             )}
-            <QuickAction className="md:col-span-4 lg:col-span-3 self-start lg:top-20 lg:sticky" />
+            <QuickAction
+              currentOrgId={orgId}
+              className="md:col-span-4 lg:col-span-3 self-start lg:top-20 lg:sticky"
+            />
           </div>
         </section>
       </div>
